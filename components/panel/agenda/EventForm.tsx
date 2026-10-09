@@ -63,7 +63,7 @@ export function EventForm({ action, defaults, matters, nonWorkingDays, cancelHre
       <Card className="space-y-5 p-5 sm:p-6">
         <FormMessage message={state.ok ? null : state.message} />
 
-        <div className="grid gap-5 sm:grid-cols-[2fr_1fr_1fr]">
+        <div className="grid gap-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
           <Field label="Título" htmlFor="title" error={errors.title} required>
             <Input
               id="title"
@@ -110,7 +110,7 @@ export function EventForm({ action, defaults, matters, nonWorkingDays, cancelHre
               <Calculator className="size-4.5 text-gold-700" aria-hidden="true" />
               Calcular plazo en días hábiles
             </p>
-            <div className="mt-3 grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+            <div className="mt-3 grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
               <Field label="Notificado el" htmlFor="deadline_from" error={errors.deadline_from}>
                 <Input
                   id="deadline_from"
@@ -165,7 +165,7 @@ export function EventForm({ action, defaults, matters, nonWorkingDays, cancelHre
           </div>
         ) : null}
 
-        <div className="grid gap-5 sm:grid-cols-[1fr_auto_1fr_1fr] sm:items-end">
+        <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_minmax(0,1fr)] sm:items-end">
           <Field label="Fecha" htmlFor="date" error={errors.date} required>
             <Input id="date" name="date" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
           </Field>

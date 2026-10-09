@@ -49,12 +49,13 @@ function duplicateFileNumber(code: string | undefined) {
 // ---------------------------------------------------------------------------
 
 export async function createMatterAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  if (!(await getTitularOrNull())) return actionError("No autorizado.");
+  const session = await getTitularOrNull();
+  if (!session) return actionError("No autorizado.");
   const parsed = parseMatter(formData);
   if (!parsed.success) return actionError("Revisá los datos marcados.", zodFieldErrors(parsed.error));
 
   const supabase = await createClient();
-  const { data, error } = await supabase.from("matters").insert(parsed.data).select("id").single();
+  const { data, error } = await supabase.from("matters").insert({ ...parsed.data, organization_id: session.active.organizationId }).select("id").single();
   if (error || !data) return duplicateFileNumber(error?.code) ?? actionError(GENERIC_ERROR);
 
   revalidatePath("/panel/expedientes");

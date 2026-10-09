@@ -22,13 +22,14 @@ function parseClient(formData: FormData) {
 }
 
 export async function createClientAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  if (!(await getTitularOrNull())) return actionError("No autorizado.");
+  const session = await getTitularOrNull();
+  if (!session) return actionError("No autorizado.");
 
   const parsed = parseClient(formData);
   if (!parsed.success) return actionError("Revisá los datos marcados.", zodFieldErrors(parsed.error));
 
   const supabase = await createClient();
-  const { data, error } = await supabase.from("clients").insert(parsed.data).select("id").single();
+  const { data, error } = await supabase.from("clients").insert({ ...parsed.data, organization_id: session.active.organizationId }).select("id").single();
   if (error || !data) return actionError(GENERIC_ERROR);
 
   revalidatePath("/panel/clientes");

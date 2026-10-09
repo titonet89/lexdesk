@@ -21,7 +21,7 @@ import { EntryForm } from "@/components/panel/matters/EntryForm";
 import { ShareForm } from "@/components/panel/matters/ShareForm";
 import { Badge, Card, CardHeader, EmptyState, PageHeader } from "@/components/panel/ui";
 import { buttonClasses } from "@/components/ui/button";
-import { requireMember } from "@/lib/auth/session";
+import { isTitularOf, requireMember } from "@/lib/auth/session";
 import { formatDateOnly, formatInZone, relativeDayLabel, todayIso } from "@/lib/panel/dates";
 import { formatBytes } from "@/lib/panel/documents";
 import {
@@ -44,8 +44,7 @@ export const metadata: Metadata = { title: "Expediente" };
 type Section = "resumen" | "actuaciones" | "agenda" | "documentos" | "colaboracion";
 
 export default async function MatterDetailPage({ params, searchParams }: PageProps<"/panel/expedientes/[id]">) {
-  const { profile } = await requireMember();
-  const isTitular = profile.role === "titular";
+  const session = await requireMember();
   const { id } = await params;
   if (!uuidSchema.safeParse(id).success) notFound();
 
@@ -57,6 +56,8 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
     .eq("id", id)
     .maybeSingle();
   if (!matter) notFound();
+  // Titular del estudio AL QUE PERTENECE el expediente (no necesariamente el activo).
+  const isTitular = isTitularOf(session, matter.organization_id);
 
   let ownShare: { permission: "lectura" | "comentario"; include_documents: boolean; expires_at: string | null } | null = null;
   if (!isTitular) {
@@ -158,7 +159,14 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
       {active === "agenda" && isTitular ? <AgendaSection matterId={id} /> : null}
       {active === "documentos" && canSeeDocuments ? <DocumentsSection matterId={id} isTitular={isTitular} /> : null}
       {active === "colaboracion" ? (
-        <CollaborationSection matterId={id} isTitular={isTitular} canComment={canComment} isSensitive={matter.is_sensitive} />
+        <CollaborationSection
+          matterId={id}
+          organizationId={matter.organization_id}
+          currentUserId={session.userId}
+          isTitular={isTitular}
+          canComment={canComment}
+          isSensitive={matter.is_sensitive}
+        />
       ) : null}
     </>
   );
@@ -193,7 +201,7 @@ function SummarySection({ matter, isTitular }: { matter: MatterWithClient; isTit
   ].filter((row) => row.value);
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_2fr]">
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
       <Card className="h-fit">
         <CardHeader title="Datos" />
         <dl className="divide-y divide-navy-900/8">
@@ -371,11 +379,15 @@ async function DocumentsSection({ matterId, isTitular }: { matterId: string; isT
 
 async function CollaborationSection({
   matterId,
+  organizationId,
+  currentUserId,
   isTitular,
   canComment,
   isSensitive,
 }: {
   matterId: string;
+  organizationId: string;
+  currentUserId: string;
   isTitular: boolean;
   canComment: boolean;
   isSensitive: boolean;
@@ -384,7 +396,7 @@ async function CollaborationSection({
   const [{ data: comments }, sharesResult, collaboratorsResult] = await Promise.all([
     supabase
       .from("matter_comments")
-      .select("id, body, created_at, profiles(full_name, email, role)")
+      .select("id, body, created_at, author_id, profiles(full_name, email)")
       .eq("matter_id", matterId)
       .order("created_at", { ascending: true }),
     isTitular
@@ -396,15 +408,29 @@ async function CollaborationSection({
           .order("created_at", { ascending: false })
       : Promise.resolve({ data: null }),
     isTitular
-      ? supabase.from("profiles").select("id, full_name, email").eq("role", "colaborador").eq("is_active", true).order("full_name")
+      ? supabase
+          .from("memberships")
+          .select("user_id, role, is_active, profiles(full_name, email)")
+          .eq("organization_id", organizationId)
       : Promise.resolve({ data: null }),
   ]);
 
   const shares = sharesResult.data ?? [];
-  const collaborators = collaboratorsResult.data ?? [];
+  const members = collaboratorsResult.data ?? [];
+  const collaborators = members
+    .filter((member) => member.role === "colaborador" && member.is_active)
+    .map((member) => ({ id: member.user_id, full_name: member.profiles?.full_name ?? "", email: member.profiles?.email ?? "" }))
+    .sort((a, b) => (a.full_name || a.email).localeCompare(b.full_name || b.email));
+  const titularIds = new Set(members.filter((member) => member.role === "titular").map((member) => member.user_id));
+
+  const authorBadge = (authorId: string) => {
+    if (authorId === currentUserId) return <Badge tone="blue">Vos</Badge>;
+    if (!isTitular) return null;
+    return titularIds.has(authorId) ? <Badge tone="gold">Titular</Badge> : <Badge>Colega</Badge>;
+  };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {isTitular ? (
         <Card className="h-fit">
           <CardHeader title="Acceso de colegas" description="Compartí este expediente para pedir una opinión." />
@@ -465,7 +491,7 @@ async function CollaborationSection({
                 <li key={comment.id} className="rounded-xl bg-slate-50 p-4">
                   <p className="flex flex-wrap items-center gap-2 text-sm">
                     <span className="font-semibold text-navy-900">{comment.profiles?.full_name || comment.profiles?.email}</span>
-                    {comment.profiles?.role === "titular" ? <Badge tone="gold">Titular</Badge> : <Badge>Colega</Badge>}
+                    {authorBadge(comment.author_id)}
                     <span className="text-navy-700">{formatInZone(comment.created_at, "d MMM yyyy · HH:mm")}</span>
                   </p>
                   <p className="mt-2 text-sm leading-relaxed whitespace-pre-line text-navy-800">{comment.body}</p>

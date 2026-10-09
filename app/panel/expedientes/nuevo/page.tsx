@@ -13,7 +13,7 @@ import { createMatterAction } from "../actions";
 export const metadata: Metadata = { title: "Nuevo expediente" };
 
 export default async function NewMatterPage({ searchParams }: PageProps<"/panel/expedientes/nuevo">) {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const { cliente } = await searchParams;
   const defaultClientId = typeof cliente === "string" && uuidSchema.safeParse(cliente).success ? cliente : undefined;
 
@@ -21,6 +21,7 @@ export default async function NewMatterPage({ searchParams }: PageProps<"/panel/
   const { data: clients } = await supabase
     .from("clients")
     .select("id, full_name")
+    .eq("organization_id", organization.organizationId)
     .is("archived_at", null)
     .order("full_name");
 

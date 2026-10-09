@@ -1,67 +1,78 @@
--- Pruebas de seguridad (RLS) del sistema de gestión.
--- Ejecutar con: npx supabase test db
+-- Pruebas de seguridad (RLS) del sistema multi-estudio.
+-- Ejecutar con: npm run test:db
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(27);
+select plan(39);
 
 -- ---------------------------------------------------------------------------
--- Datos de prueba (como superusuario)
+-- Datos de prueba (como superusuario): dos estudios, A y B.
 -- ---------------------------------------------------------------------------
-insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data)
+insert into auth.users (id, email, raw_user_meta_data)
 values
-  ('11111111-1111-1111-1111-111111111111', 'titular@test.local', '{"role":"titular"}', '{"full_name":"Titular"}'),
-  ('22222222-2222-2222-2222-222222222222', 'colega@test.local', '{"role":"colaborador"}', '{"full_name":"Colega"}'),
-  ('33333333-3333-3333-3333-333333333333', 'intruso@test.local', '{}', '{"full_name":"Auto titular"}');
+  ('11111111-1111-1111-1111-111111111111', 'titular.a@test.local', '{"full_name":"Titular A"}'),
+  ('22222222-2222-2222-2222-222222222222', 'colega@test.local', '{"full_name":"Colega"}'),
+  ('33333333-3333-3333-3333-333333333333', 'titular.b@test.local', '{"full_name":"Titular B"}'),
+  ('55555555-5555-5555-5555-555555555555', 'sin.estudio@test.local', '{"full_name":"Sin estudio"}');
 
-select is(
-  (select role::text from public.profiles where id = '11111111-1111-1111-1111-111111111111'),
-  'titular', 'El rol titular sale de app_metadata');
-select is(
-  (select role::text from public.profiles where id = '33333333-3333-3333-3333-333333333333'),
-  'colaborador', 'Sin app_metadata, el rol por defecto es colaborador');
+select is((select count(*)::int from public.profiles where id = '55555555-5555-5555-5555-555555555555'), 1,
+  'Al crear un usuario se crea su perfil');
 
--- Como hace el servicio de auth: crea el usuario y luego escribe app_metadata.
-insert into auth.users (id, email, raw_app_meta_data)
-values ('44444444-4444-4444-4444-444444444444', 'tardio@test.local', '{"provider":"email"}');
-update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role":"titular"}'
-  where id = '44444444-4444-4444-4444-444444444444';
-select is(
-  (select role::text from public.profiles where id = '44444444-4444-4444-4444-444444444444'),
-  'titular', 'El rol se sincroniza cuando app_metadata se escribe después de crear el usuario');
-delete from auth.users where id = '44444444-4444-4444-4444-444444444444';
+insert into public.organizations (id, name) values
+  ('aaaa0000-0000-0000-0000-00000000000a', 'Estudio A'),
+  ('bbbb0000-0000-0000-0000-00000000000b', 'Estudio B');
 
-insert into public.clients (id, full_name, created_by)
-values ('aaaaaaaa-0000-0000-0000-000000000001', 'Cliente Uno', '11111111-1111-1111-1111-111111111111');
+insert into public.memberships (organization_id, user_id, role) values
+  ('aaaa0000-0000-0000-0000-00000000000a', '11111111-1111-1111-1111-111111111111', 'titular'),
+  ('aaaa0000-0000-0000-0000-00000000000a', '22222222-2222-2222-2222-222222222222', 'colaborador'),
+  ('bbbb0000-0000-0000-0000-00000000000b', '33333333-3333-3333-3333-333333333333', 'titular'),
+  -- El mismo colega también colabora con el estudio B.
+  ('bbbb0000-0000-0000-0000-00000000000b', '22222222-2222-2222-2222-222222222222', 'colaborador');
 
-insert into public.matters (id, client_id, title, area, created_by)
-values
-  ('bbbbbbbb-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000001', 'Uno c/ Otro s/ alimentos', 'familia', '11111111-1111-1111-1111-111111111111'),
-  ('bbbbbbbb-0000-0000-0000-000000000002', 'aaaaaaaa-0000-0000-0000-000000000001', 'Caso reservado', 'violencia_genero', '11111111-1111-1111-1111-111111111111');
+insert into public.clients (id, organization_id, full_name) values
+  ('c0000000-0000-0000-0000-00000000000a', 'aaaa0000-0000-0000-0000-00000000000a', 'Cliente de A'),
+  ('c0000000-0000-0000-0000-00000000000b', 'bbbb0000-0000-0000-0000-00000000000b', 'Cliente de B');
 
-update public.matters set is_sensitive = true where id = 'bbbbbbbb-0000-0000-0000-000000000002';
+insert into public.matters (id, organization_id, client_id, title, area) values
+  ('d0000000-0000-0000-0000-0000000000a1', 'aaaa0000-0000-0000-0000-00000000000a', 'c0000000-0000-0000-0000-00000000000a', 'A c/ X s/ alimentos', 'familia'),
+  ('d0000000-0000-0000-0000-0000000000a2', 'aaaa0000-0000-0000-0000-00000000000a', 'c0000000-0000-0000-0000-00000000000a', 'Caso reservado de A', 'violencia_genero'),
+  ('d0000000-0000-0000-0000-0000000000b1', 'bbbb0000-0000-0000-0000-00000000000b', 'c0000000-0000-0000-0000-00000000000b', 'B c/ Y s/ daños', 'civil');
 
-insert into public.events (title, kind, starts_at, matter_id, created_by)
-values ('Audiencia', 'audiencia', now() + interval '1 day', 'bbbbbbbb-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111');
+update public.matters set is_sensitive = true where id = 'd0000000-0000-0000-0000-0000000000a2';
 
-insert into public.documents (matter_id, name, storage_path, mime_type, size_bytes)
-values ('bbbbbbbb-0000-0000-0000-000000000001', 'demanda.pdf', 'bbbbbbbb-0000-0000-0000-000000000001/x/demanda.pdf', 'application/pdf', 1000);
+insert into public.events (organization_id, matter_id, title, kind, starts_at) values
+  ('aaaa0000-0000-0000-0000-00000000000a', 'd0000000-0000-0000-0000-0000000000a1', 'Audiencia A', 'audiencia', now() + interval '1 day'),
+  ('bbbb0000-0000-0000-0000-00000000000b', 'd0000000-0000-0000-0000-0000000000b1', 'Audiencia B', 'audiencia', now() + interval '1 day');
 
--- Totales reales (como superusuario) para comparar sin depender de datos previos.
-select set_config('test.total_clients', (select count(*) from public.clients)::text, true);
-select set_config('test.total_matters', (select count(*) from public.matters)::text, true);
-select set_config('test.total_events', (select count(*) from public.events)::text, true);
+insert into public.documents (matter_id, name, storage_path, mime_type, size_bytes) values
+  ('d0000000-0000-0000-0000-0000000000a1', 'demanda.pdf', 'd0000000-0000-0000-0000-0000000000a1/x/demanda.pdf', 'application/pdf', 1000);
+
+insert into public.non_working_days (organization_id, day, description) values
+  ('aaaa0000-0000-0000-0000-00000000000a', '2026-12-25', 'Navidad'),
+  ('bbbb0000-0000-0000-0000-00000000000b', '2026-12-25', 'Navidad');
+
+select ok(true, 'Dos estudios pueden cargar el mismo día inhábil');
+
+-- Integridad entre estudios
+select throws_ok(
+  $$insert into public.matters (organization_id, client_id, title, area)
+    values ('aaaa0000-0000-0000-0000-00000000000a', 'c0000000-0000-0000-0000-00000000000b', 'Cruce', 'civil')$$,
+  'P0001', null, 'Un expediente no puede apuntar a un cliente de otro estudio');
+select throws_ok(
+  $$insert into public.events (organization_id, matter_id, title, kind, starts_at)
+    values ('aaaa0000-0000-0000-0000-00000000000a', 'd0000000-0000-0000-0000-0000000000b1', 'Cruce', 'audiencia', now())$$,
+  'P0001', null, 'Un evento no puede apuntar a un expediente de otro estudio');
 
 -- ---------------------------------------------------------------------------
 -- Anónimo
 -- ---------------------------------------------------------------------------
 set local role anon;
 select throws_ok('select * from public.matters', '42501', null, 'Anónimo: sin permiso sobre expedientes');
-select throws_ok('select * from public.clients', '42501', null, 'Anónimo: sin permiso sobre clientes');
+select throws_ok('select * from public.organizations', '42501', null, 'Anónimo: sin permiso sobre estudios');
 reset role;
 
 -- ---------------------------------------------------------------------------
--- Titular SIN 2FA (aal1): no ve nada
+-- Titular A SIN 2FA (aal1): no ve nada
 -- ---------------------------------------------------------------------------
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated","aal":"aal1"}', true);
@@ -70,80 +81,118 @@ select is((select count(*)::int from public.matters), 0, 'Titular sin 2FA: no ve
 reset role;
 
 -- ---------------------------------------------------------------------------
--- Titular CON 2FA (aal2): acceso total
+-- Titular A CON 2FA: ve todo lo de A y NADA de B
 -- ---------------------------------------------------------------------------
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated","aal":"aal2"}', true);
-select is((select count(*)::int from public.clients), current_setting('test.total_clients')::int, 'Titular con 2FA: ve todos los clientes');
-select is((select count(*)::int from public.matters), current_setting('test.total_matters')::int, 'Titular con 2FA: ve todos los expedientes');
-select is((select count(*)::int from public.events), current_setting('test.total_events')::int, 'Titular con 2FA: ve toda la agenda');
-select lives_ok(
-  $$insert into public.matter_entries (matter_id, summary) values ('bbbbbbbb-0000-0000-0000-000000000001', 'Se presentó demanda')$$,
-  'Titular: carga actuaciones');
+select is((select count(*)::int from public.clients), 1, 'Titular A: ve solo los clientes de A');
+select is((select count(*)::int from public.matters), 2, 'Titular A: ve solo los expedientes de A');
+select is((select count(*)::int from public.events), 1, 'Titular A: ve solo la agenda de A');
+select is((select count(*)::int from public.organizations), 1, 'Titular A: ve solo su estudio');
+select is((select count(*)::int from public.memberships), 2, 'Titular A: ve las membresías de su estudio');
+select is((select count(*)::int from public.matters where id = 'd0000000-0000-0000-0000-0000000000b1'), 0,
+  'Titular A: el expediente de B no existe para ella');
 select throws_ok(
-  $$insert into public.matter_shares (matter_id, collaborator_id) values ('bbbbbbbb-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222')$$,
-  'P0001', null, 'Un expediente sensible no se puede compartir');
+  $$insert into public.clients (organization_id, full_name) values ('bbbb0000-0000-0000-0000-00000000000b', 'Intruso')$$,
+  '42501', null, 'Titular A: no puede crear clientes en el estudio B');
+update public.clients set full_name = 'Modificado' where id = 'c0000000-0000-0000-0000-00000000000b';
+select throws_ok(
+  $$insert into public.memberships (organization_id, user_id, role) values ('bbbb0000-0000-0000-0000-00000000000b', '11111111-1111-1111-1111-111111111111', 'titular')$$,
+  '42501', null, 'Nadie se puede agregar a un estudio desde la API');
 select lives_ok(
-  $$insert into public.matter_shares (matter_id, collaborator_id, permission) values ('bbbbbbbb-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222', 'lectura')$$,
-  'Titular: comparte un expediente en modo lectura');
+  $$insert into public.matter_entries (matter_id, summary) values ('d0000000-0000-0000-0000-0000000000a1', 'Se presentó demanda')$$,
+  'Titular A: carga actuaciones');
+select throws_ok(
+  $$insert into public.matter_entries (matter_id, summary) values ('d0000000-0000-0000-0000-0000000000b1', 'Intrusión')$$,
+  '42501', null, 'Titular A: no carga actuaciones en expedientes de B');
+select throws_ok(
+  $$insert into public.matter_shares (matter_id, collaborator_id) values ('d0000000-0000-0000-0000-0000000000a2', '22222222-2222-2222-2222-222222222222')$$,
+  'P0001', null, 'Un expediente sensible no se puede compartir');
+select throws_ok(
+  $$insert into public.matter_shares (matter_id, collaborator_id) values ('d0000000-0000-0000-0000-0000000000a1', '33333333-3333-3333-3333-333333333333')$$,
+  'P0001', null, 'Solo se comparte con colaboradores del propio estudio');
+select lives_ok(
+  $$insert into public.matter_shares (matter_id, collaborator_id, permission) values ('d0000000-0000-0000-0000-0000000000a1', '22222222-2222-2222-2222-222222222222', 'lectura')$$,
+  'Titular A: comparte un expediente en modo lectura');
 select throws_ok(
   $$insert into public.audit_log (action, table_name) values ('insert', 'x')$$,
   '42501', null, 'Nadie escribe la auditoría directamente');
-select ok((select count(*) from public.audit_log) > 0, 'La titular ve la auditoría');
+select is((select count(*)::int from public.audit_log where organization_id = 'bbbb0000-0000-0000-0000-00000000000b'), 0,
+  'Titular A: no ve la auditoría de B');
 reset role;
 
+select is((select full_name from public.clients where id = 'c0000000-0000-0000-0000-00000000000b'), 'Cliente de B',
+  'Titular A: no puede modificar clientes de B');
+
 -- ---------------------------------------------------------------------------
--- Colaborador con expediente compartido en LECTURA
+-- Colega: colaborador en A (con acceso a un expediente) y en B (sin accesos)
 -- ---------------------------------------------------------------------------
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated","aal":"aal2"}', true);
-select is((select count(*)::int from public.matters), 1, 'Colaborador: ve solo el expediente compartido');
-select is((select count(*)::int from public.matter_entries), 1, 'Colaborador: ve sus actuaciones');
-select is((select count(*)::int from public.clients), 0, 'Colaborador: NO ve datos de clientes');
-select is((select count(*)::int from public.events), 0, 'Colaborador: NO ve la agenda');
-select is((select count(*)::int from public.documents), 0, 'Colaborador: no ve documentos si no se incluyeron');
-select is((select count(*)::int from public.audit_log), 0, 'Colaborador: NO ve la auditoría');
+select is((select count(*)::int from public.matters), 1, 'Colega: ve solo el expediente compartido');
+select is((select count(*)::int from public.matter_entries), 1, 'Colega: ve sus actuaciones');
+select is((select count(*)::int from public.clients), 0, 'Colega: NO ve datos de clientes');
+select is((select count(*)::int from public.events), 0, 'Colega: NO ve la agenda');
+select is((select count(*)::int from public.documents), 0, 'Colega: no ve documentos si no se incluyeron');
+select is((select count(*)::int from public.audit_log), 0, 'Colega: NO ve la auditoría');
 select throws_ok(
-  $$insert into public.matter_comments (matter_id, body) values ('bbbbbbbb-0000-0000-0000-000000000001', 'Opinión')$$,
-  '42501', null, 'Colaborador en lectura: no puede comentar');
-select throws_ok(
-  $$update public.profiles set role = 'titular' where id = '22222222-2222-2222-2222-222222222222'$$,
-  '42501', null, 'Colaborador: no puede auto-asignarse el rol titular');
-update public.matters set title = 'Hackeado' where id = 'bbbbbbbb-0000-0000-0000-000000000001';
+  $$insert into public.matter_comments (matter_id, body) values ('d0000000-0000-0000-0000-0000000000a1', 'Opinión')$$,
+  '42501', null, 'Colega en lectura: no puede comentar');
+update public.matters set title = 'Hackeado' where id = 'd0000000-0000-0000-0000-0000000000a1';
 reset role;
 
-select is(
-  (select title from public.matters where id = 'bbbbbbbb-0000-0000-0000-000000000001'),
-  'Uno c/ Otro s/ alimentos', 'Colaborador: no puede modificar expedientes');
+select is((select title from public.matters where id = 'd0000000-0000-0000-0000-0000000000a1'), 'A c/ X s/ alimentos',
+  'Colega: no puede modificar expedientes');
 
--- Permiso de comentario
-update public.matter_shares set permission = 'comentario'
-  where matter_id = 'bbbbbbbb-0000-0000-0000-000000000001';
+-- Desactivar al colega en A le quita el acceso a A (sin afectar su membresía en B).
+update public.memberships set is_active = false
+  where organization_id = 'aaaa0000-0000-0000-0000-00000000000a' and user_id = '22222222-2222-2222-2222-222222222222';
 
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated","aal":"aal2"}', true);
-select lives_ok(
-  $$insert into public.matter_comments (matter_id, body) values ('bbbbbbbb-0000-0000-0000-000000000001', 'Sugiero ampliar la prueba')$$,
-  'Colaborador con permiso de comentario: puede comentar');
+select is((select count(*)::int from public.matters), 0, 'Colega desactivado en A: pierde el acceso a A');
+select is((select count(*)::int from public.organizations), 1, 'Colega desactivado en A: sigue siendo miembro de B');
 reset role;
 
--- Al marcar el expediente como sensible, se revoca el acceso
-update public.matters set is_sensitive = true where id = 'bbbbbbbb-0000-0000-0000-000000000001';
+update public.memberships set is_active = true
+  where organization_id = 'aaaa0000-0000-0000-0000-00000000000a' and user_id = '22222222-2222-2222-2222-222222222222';
+
+-- Al marcar el expediente como sensible, se revoca el acceso.
+update public.matters set is_sensitive = true where id = 'd0000000-0000-0000-0000-0000000000a1';
 
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated","aal":"aal2"}', true);
 select is((select count(*)::int from public.matters), 0, 'Marcar como sensible revoca el acceso compartido');
 reset role;
 
--- Un acceso vencido no da acceso
-update public.matters set is_sensitive = false where id = 'bbbbbbbb-0000-0000-0000-000000000001';
+-- Un acceso vencido no da acceso.
+update public.matters set is_sensitive = false where id = 'd0000000-0000-0000-0000-0000000000a1';
 insert into public.matter_shares (matter_id, collaborator_id, expires_at)
-values ('bbbbbbbb-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222', now() - interval '1 minute');
+values ('d0000000-0000-0000-0000-0000000000a1', '22222222-2222-2222-2222-222222222222', now() - interval '1 minute');
 
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated","aal":"aal2"}', true);
 select is((select count(*)::int from public.matters), 0, 'Un acceso vencido no da acceso');
 reset role;
+
+-- Un usuario sin estudio no ve nada aunque tenga 2FA.
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"55555555-5555-5555-5555-555555555555","role":"authenticated","aal":"aal2"}', true);
+select is((select count(*)::int from public.matters) + (select count(*)::int from public.organizations), 0,
+  'Usuario sin estudio: no ve nada');
+reset role;
+
+-- Eliminar un estudio borra en cascada todos sus datos (y nada de otros estudios).
+delete from public.organizations where id = 'aaaa0000-0000-0000-0000-00000000000a';
+select is(
+  (select count(*)::int from public.clients where organization_id = 'aaaa0000-0000-0000-0000-00000000000a')
+  + (select count(*)::int from public.matters where organization_id = 'aaaa0000-0000-0000-0000-00000000000a')
+  + (select count(*)::int from public.matter_entries where matter_id = 'd0000000-0000-0000-0000-0000000000a1')
+  + (select count(*)::int from public.documents where matter_id = 'd0000000-0000-0000-0000-0000000000a1')
+  + (select count(*)::int from public.events where organization_id = 'aaaa0000-0000-0000-0000-00000000000a'),
+  0, 'Eliminar un estudio borra todos sus datos');
+select is((select count(*)::int from public.matters where organization_id = 'bbbb0000-0000-0000-0000-00000000000b'), 1,
+  'Eliminar un estudio no afecta a otros estudios');
 
 select * from finish();
 rollback;

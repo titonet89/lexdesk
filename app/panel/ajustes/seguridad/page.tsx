@@ -13,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = { title: "Seguridad" };
 
 export default async function SecurityPage() {
-  const { profile, email } = await requireMember();
+  const { profile, email, active } = await requireMember();
   const supabase = await createClient();
   const { data: factors } = await supabase.auth.mfa.listFactors();
   const verifiedFactors = (factors?.totp ?? []).filter((factor) => factor.status === "verified");
@@ -23,7 +23,7 @@ export default async function SecurityPage() {
       <PageHeader
         title="Seguridad de la cuenta"
         eyebrow={
-          profile.role === "titular" ? (
+          active.role === "titular" ? (
             <Link href="/panel/ajustes" className="inline-flex items-center gap-1 hover:text-navy-900">
               <ArrowLeft className="size-4" aria-hidden="true" />
               Ajustes

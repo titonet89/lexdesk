@@ -128,6 +128,8 @@ test.describe("gestión del estudio", () => {
   let titularPage: Page;
   let matterUrl = "";
   let colleagueSecret = "";
+  let otherSecret = "";
+  let otherTitularPage: Page;
 
   test.beforeAll(async ({ browser }) => {
     await deleteUserIfExists(COLLEAGUE.email);
@@ -276,6 +278,54 @@ test.describe("gestión del estudio", () => {
 
     await page.reload();
     await expect(page.getByTestId("comments-list")).toContainText("Registro de la Propiedad");
+  });
+
+  test("la titular de otro estudio no puede ver estos datos", async ({ browser }) => {
+    const other = { email: "titular.b.e2e@test.local", password: "Otro-Estudio-2026", name: `Dra. Otra ${RUN}` };
+    await recreateUser(other.email, other.password, "titular", other.name);
+
+    const page = await (await browser.newContext()).newPage();
+    await login(page, other.email, other.password);
+    await page.waitForURL(/activar-2fa/);
+    await page.getByText("¿No podés escanear?").click();
+    otherSecret = (await page.getByTestId("totp-secret").textContent())?.trim() ?? "";
+    await page.getByLabel("Código de la app").fill(await freshCode(page, otherSecret));
+    await page.getByRole("button", { name: "Activar y continuar" }).click();
+    await page.waitForURL(/\/panel$/);
+    await expect(page.getByTestId("active-organization").first()).toHaveText(`Estudio ${other.name}`);
+
+    // El expediente del primer estudio no existe para ella, ni por URL directa.
+    const response = await page.goto(matterUrl);
+    expect(response?.status()).toBe(404);
+    await page.goto(`/panel/clientes?q=${encodeURIComponent(CLIENT)}`);
+    await expect(page.getByText("Sin resultados")).toBeVisible();
+    otherTitularPage = page;
+  });
+
+  test("el mismo colega puede colaborar con dos estudios", async ({ browser }) => {
+    // El segundo estudio invita al colega que ya tiene cuenta: se lo suma sin crear otra.
+    await otherTitularPage.goto("/panel/colaboradores");
+    await otherTitularPage.getByLabel("Nombre y apellido").fill(COLLEAGUE.name);
+    await otherTitularPage.getByLabel("Email").fill(COLLEAGUE.email);
+    await otherTitularPage.getByRole("button", { name: "Enviar invitación" }).click();
+    await expect(otherTitularPage.getByTestId("invite-form").getByRole("status")).toContainText("ya tenía cuenta");
+    await otherTitularPage.context().close();
+
+    const colleague = await (await browser.newContext()).newPage();
+    await login(colleague, COLLEAGUE.email, COLLEAGUE.password);
+    await colleague.waitForURL(/\/acceso\/verificar/);
+    await colleague.getByLabel("Código de verificación").fill(await freshCode(colleague, colleagueSecret));
+    await colleague.getByRole("button", { name: "Verificar" }).click();
+    await colleague.waitForURL(/\/panel$/);
+
+    // Ve el selector con los dos estudios y puede cambiar entre ellos.
+    const switcher = colleague.locator("aside").getByTestId("active-organization");
+    for (const target of [`Estudio ${TITULAR.name}`, "Estudio Dra. Otra"]) {
+      await colleague.locator("aside summary").click();
+      await colleague.locator("aside").getByRole("button", { name: new RegExp(target.replace(/\./g, "\\.")) }).click();
+      await expect(switcher).toContainText(target);
+    }
+    await colleague.context().close();
   });
 
   test("marcar el expediente como sensible revoca el acceso del colega", async () => {

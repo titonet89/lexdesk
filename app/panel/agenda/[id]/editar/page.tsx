@@ -14,14 +14,14 @@ import { loadEventFormData } from "../../data";
 export const metadata: Metadata = { title: "Editar evento" };
 
 export default async function EditEventPage({ params }: PageProps<"/panel/agenda/[id]/editar">) {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const { id } = await params;
   if (!uuidSchema.safeParse(id).success) notFound();
 
   const supabase = await createClient();
   const [{ data: event }, { matters, nonWorkingDays }] = await Promise.all([
     supabase.from("events").select("*").eq("id", id).maybeSingle(),
-    loadEventFormData(),
+    loadEventFormData(organization.organizationId),
   ]);
   if (!event) notFound();
 

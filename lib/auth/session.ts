@@ -1,5 +1,6 @@
 import "server-only";
 import { cache } from "react";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
@@ -7,15 +8,28 @@ import type { Database } from "@/lib/supabase/database.types";
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type AppRole = Database["public"]["Enums"]["app_role"];
 
+/** Cookie con el estudio activo. Solo es una preferencia: siempre se valida contra las membresías. */
+export const ACTIVE_ORG_COOKIE = "lexdesk_org";
+
+export interface Membership {
+  organizationId: string;
+  organizationName: string;
+  role: AppRole;
+}
+
 export interface MemberSession {
   userId: string;
   email: string;
   profile: Profile;
+  /** Estudios donde la persona es miembro activo. */
+  memberships: Membership[];
+  /** Estudio en el que está trabajando ahora. */
+  active: Membership;
 }
 
 /**
- * Devuelve la sesión del miembro SOLO si pasó la verificación en dos pasos.
- * Memoizada por request con `cache` para no repetir llamadas.
+ * Devuelve la sesión SOLO si pasó la verificación en dos pasos y pertenece
+ * al menos a un estudio activo. Memoizada por request con `cache`.
  */
 export const getMemberSession = cache(async (): Promise<MemberSession | null> => {
   const supabase = await createClient();
@@ -26,14 +40,29 @@ export const getMemberSession = cache(async (): Promise<MemberSession | null> =>
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   if (aal?.currentLevel !== "aal2") return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userData.user.id)
-    .single();
-  if (!profile || !profile.is_active) return null;
+  const [{ data: profile }, { data: rows }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", userData.user.id).single(),
+    supabase
+      .from("memberships")
+      .select("organization_id, role, organizations(name)")
+      .eq("user_id", userData.user.id)
+      .eq("is_active", true),
+  ]);
+  if (!profile || !rows || rows.length === 0) return null;
 
-  return { userId: userData.user.id, email: userData.user.email ?? profile.email, profile };
+  const memberships: Membership[] = rows
+    .map((row) => ({
+      organizationId: row.organization_id,
+      organizationName: row.organizations?.name ?? "Estudio",
+      role: row.role,
+    }))
+    // Primero los estudios donde es titular.
+    .sort((a, b) => Number(b.role === "titular") - Number(a.role === "titular") || a.organizationName.localeCompare(b.organizationName));
+
+  const preferred = (await cookies()).get(ACTIVE_ORG_COOKIE)?.value;
+  const active = memberships.find((membership) => membership.organizationId === preferred) ?? memberships[0];
+
+  return { userId: userData.user.id, email: userData.user.email ?? profile.email, profile, memberships, active };
 });
 
 /**
@@ -53,20 +82,27 @@ export async function requireMember(): Promise<MemberSession> {
   if (aal?.nextLevel === "aal1") redirect("/acceso/activar-2fa");
   if (aal?.currentLevel === "aal1") redirect("/acceso/verificar");
 
-  // Sesión válida con 2FA pero perfil inexistente o desactivado.
+  // Sesión válida con 2FA pero sin ningún estudio activo.
   await supabase.auth.signOut();
   redirect("/acceso?estado=inactivo");
 }
 
-/** Exige que el miembro sea la titular; si no, lo devuelve al panel. */
+/** Exige que la persona sea titular del estudio activo; si no, la devuelve al panel. */
 export async function requireTitular(): Promise<MemberSession> {
   const session = await requireMember();
-  if (session.profile.role !== "titular") redirect("/panel");
+  if (session.active.role !== "titular") redirect("/panel");
   return session;
 }
 
-/** Para Server Actions: devuelve la sesión de la titular o `null` (sin redirigir). */
+/** Para Server Actions: sesión de la titular del estudio activo o `null` (sin redirigir). */
 export async function getTitularOrNull(): Promise<MemberSession | null> {
   const session = await getMemberSession();
-  return session?.profile.role === "titular" ? session : null;
+  return session?.active.role === "titular" ? session : null;
+}
+
+/** ¿Es titular del estudio indicado? (para recursos de un estudio distinto del activo). */
+export function isTitularOf(session: MemberSession, organizationId: string): boolean {
+  return session.memberships.some(
+    (membership) => membership.organizationId === organizationId && membership.role === "titular",
+  );
 }

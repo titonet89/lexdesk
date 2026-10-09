@@ -16,7 +16,7 @@ type MatterStatus = (typeof Constants.public.Enums.matter_status)[number];
 type PracticeArea = (typeof Constants.public.Enums.practice_area)[number];
 
 export default async function MattersPage({ searchParams }: PageProps<"/panel/expedientes">) {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const params = await searchParams;
   const query = sanitizeSearch(params.q);
   const status = Constants.public.Enums.matter_status.find((value) => value === params.estado) as MatterStatus | undefined;
@@ -26,6 +26,7 @@ export default async function MattersPage({ searchParams }: PageProps<"/panel/ex
   let request = supabase
     .from("matters")
     .select("id, title, file_number, area, status, opened_on, is_sensitive, court, clients(full_name)")
+    .eq("organization_id", organization.organizationId)
     .order("updated_at", { ascending: false })
     .limit(200);
   if (status) request = request.eq("status", status);
@@ -47,7 +48,7 @@ export default async function MattersPage({ searchParams }: PageProps<"/panel/ex
         }
       />
 
-      <form className="mb-4 grid gap-2 sm:grid-cols-[1fr_auto_auto_auto]" role="search">
+      <form className="mb-4 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]" role="search">
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-navy-700/60" aria-hidden="true" />
           <Input name="q" type="search" defaultValue={query} placeholder="Buscar por carátula o número…" aria-label="Buscar expedientes" className="pl-10" />

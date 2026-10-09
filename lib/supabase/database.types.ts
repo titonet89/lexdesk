@@ -7,28 +7,34 @@ export type Database = {
           Tables: {
             "audit_log": {
                   Row: {
-                    "action": string,"actor_id": string | null,"changed_columns": (string)[] | null,"id": number,"occurred_at": string,"record_id": string | null,"table_name": string
+                    "action": string,"actor_id": string | null,"changed_columns": (string)[] | null,"id": number,"occurred_at": string,"organization_id": string | null,"record_id": string | null,"table_name": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "action": string,"actor_id"?: string | null,"changed_columns"?: (string)[] | null,"id"?: never,"occurred_at"?: string,"record_id"?: string | null,"table_name": string
+                    "action": string,"actor_id"?: string | null,"changed_columns"?: (string)[] | null,"id"?: never,"occurred_at"?: string,"organization_id"?: string | null,"record_id"?: string | null,"table_name": string
                   }
                   Update: {
-                    "action"?: string,"actor_id"?: string | null,"changed_columns"?: (string)[] | null,"id"?: never,"occurred_at"?: string,"record_id"?: string | null,"table_name"?: string
+                    "action"?: string,"actor_id"?: string | null,"changed_columns"?: (string)[] | null,"id"?: never,"occurred_at"?: string,"organization_id"?: string | null,"record_id"?: string | null,"table_name"?: string
                   }
                   Relationships: [
-                    
+                    {
+      foreignKeyName: "audit_log_organization_id_fkey"
+      columns: ["organization_id"]
+isOneToOne: false
+      referencedRelation: "organizations"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"clients": {
                   Row: {
-                    "address": string | null,"archived_at": string | null,"created_at": string,"created_by": string | null,"document_number": string | null,"document_type": Database["public"]['Enums']["document_type"] | null,"email": string | null,"full_name": string,"id": string,"kind": Database["public"]['Enums']["client_kind"],"locality": string | null,"notes": string | null,"phone": string | null,"updated_at": string
+                    "address": string | null,"archived_at": string | null,"created_at": string,"created_by": string | null,"document_number": string | null,"document_type": Database["public"]['Enums']["document_type"] | null,"email": string | null,"full_name": string,"id": string,"kind": Database["public"]['Enums']["client_kind"],"locality": string | null,"notes": string | null,"organization_id": string,"phone": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "address"?: string | null,"archived_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"document_number"?: string | null,"document_type"?: Database["public"]['Enums']["document_type"] | null,"email"?: string | null,"full_name": string,"id"?: string,"kind"?: Database["public"]['Enums']["client_kind"],"locality"?: string | null,"notes"?: string | null,"phone"?: string | null,"updated_at"?: string
+                    "address"?: string | null,"archived_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"document_number"?: string | null,"document_type"?: Database["public"]['Enums']["document_type"] | null,"email"?: string | null,"full_name": string,"id"?: string,"kind"?: Database["public"]['Enums']["client_kind"],"locality"?: string | null,"notes"?: string | null,"organization_id": string,"phone"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "address"?: string | null,"archived_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"document_number"?: string | null,"document_type"?: Database["public"]['Enums']["document_type"] | null,"email"?: string | null,"full_name"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["client_kind"],"locality"?: string | null,"notes"?: string | null,"phone"?: string | null,"updated_at"?: string
+                    "address"?: string | null,"archived_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"document_number"?: string | null,"document_type"?: Database["public"]['Enums']["document_type"] | null,"email"?: string | null,"full_name"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["client_kind"],"locality"?: string | null,"notes"?: string | null,"organization_id"?: string,"phone"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -36,6 +42,12 @@ export type Database = {
       columns: ["created_by"]
 isOneToOne: false
       referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "clients_organization_id_fkey"
+      columns: ["organization_id"]
+isOneToOne: false
+      referencedRelation: "organizations"
       referencedColumns: ["id"]
     }
                   ]
@@ -67,14 +79,14 @@ isOneToOne: false
                   ]
                 },"events": {
                   Row: {
-                    "all_day": boolean,"completed_at": string | null,"created_at": string,"created_by": string | null,"deadline_business_days": number | null,"deadline_from": string | null,"ends_at": string | null,"id": string,"kind": Database["public"]['Enums']["event_kind"],"location": string | null,"matter_id": string | null,"notes": string | null,"priority": Database["public"]['Enums']["event_priority"],"starts_at": string,"status": Database["public"]['Enums']["event_status"],"title": string,"updated_at": string
+                    "all_day": boolean,"completed_at": string | null,"created_at": string,"created_by": string | null,"deadline_business_days": number | null,"deadline_from": string | null,"ends_at": string | null,"id": string,"kind": Database["public"]['Enums']["event_kind"],"location": string | null,"matter_id": string | null,"notes": string | null,"organization_id": string,"priority": Database["public"]['Enums']["event_priority"],"starts_at": string,"status": Database["public"]['Enums']["event_status"],"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "all_day"?: boolean,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"deadline_business_days"?: number | null,"deadline_from"?: string | null,"ends_at"?: string | null,"id"?: string,"kind"?: Database["public"]['Enums']["event_kind"],"location"?: string | null,"matter_id"?: string | null,"notes"?: string | null,"priority"?: Database["public"]['Enums']["event_priority"],"starts_at": string,"status"?: Database["public"]['Enums']["event_status"],"title": string,"updated_at"?: string
+                    "all_day"?: boolean,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"deadline_business_days"?: number | null,"deadline_from"?: string | null,"ends_at"?: string | null,"id"?: string,"kind"?: Database["public"]['Enums']["event_kind"],"location"?: string | null,"matter_id"?: string | null,"notes"?: string | null,"organization_id": string,"priority"?: Database["public"]['Enums']["event_priority"],"starts_at": string,"status"?: Database["public"]['Enums']["event_status"],"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "all_day"?: boolean,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"deadline_business_days"?: number | null,"deadline_from"?: string | null,"ends_at"?: string | null,"id"?: string,"kind"?: Database["public"]['Enums']["event_kind"],"location"?: string | null,"matter_id"?: string | null,"notes"?: string | null,"priority"?: Database["public"]['Enums']["event_priority"],"starts_at"?: string,"status"?: Database["public"]['Enums']["event_status"],"title"?: string,"updated_at"?: string
+                    "all_day"?: boolean,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"deadline_business_days"?: number | null,"deadline_from"?: string | null,"ends_at"?: string | null,"id"?: string,"kind"?: Database["public"]['Enums']["event_kind"],"location"?: string | null,"matter_id"?: string | null,"notes"?: string | null,"organization_id"?: string,"priority"?: Database["public"]['Enums']["event_priority"],"starts_at"?: string,"status"?: Database["public"]['Enums']["event_status"],"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -88,6 +100,12 @@ isOneToOne: false
       columns: ["matter_id"]
 isOneToOne: false
       referencedRelation: "matters"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "events_organization_id_fkey"
+      columns: ["organization_id"]
+isOneToOne: false
+      referencedRelation: "organizations"
       referencedColumns: ["id"]
     }
                   ]
@@ -177,14 +195,14 @@ isOneToOne: false
                   ]
                 },"matters": {
                   Row: {
-                    "area": Database["public"]['Enums']["practice_area"],"client_id": string,"closed_on": string | null,"counterpart": string | null,"court": string | null,"created_at": string,"created_by": string | null,"description": string | null,"file_number": string | null,"id": string,"is_sensitive": boolean,"jurisdiction": string,"opened_on": string,"status": Database["public"]['Enums']["matter_status"],"title": string,"updated_at": string
+                    "area": Database["public"]['Enums']["practice_area"],"client_id": string,"closed_on": string | null,"counterpart": string | null,"court": string | null,"created_at": string,"created_by": string | null,"description": string | null,"file_number": string | null,"id": string,"is_sensitive": boolean,"jurisdiction": string,"opened_on": string,"organization_id": string,"status": Database["public"]['Enums']["matter_status"],"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "area": Database["public"]['Enums']["practice_area"],"client_id": string,"closed_on"?: string | null,"counterpart"?: string | null,"court"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"file_number"?: string | null,"id"?: string,"is_sensitive"?: boolean,"jurisdiction"?: string,"opened_on"?: string,"status"?: Database["public"]['Enums']["matter_status"],"title": string,"updated_at"?: string
+                    "area": Database["public"]['Enums']["practice_area"],"client_id": string,"closed_on"?: string | null,"counterpart"?: string | null,"court"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"file_number"?: string | null,"id"?: string,"is_sensitive"?: boolean,"jurisdiction"?: string,"opened_on"?: string,"organization_id": string,"status"?: Database["public"]['Enums']["matter_status"],"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "area"?: Database["public"]['Enums']["practice_area"],"client_id"?: string,"closed_on"?: string | null,"counterpart"?: string | null,"court"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"file_number"?: string | null,"id"?: string,"is_sensitive"?: boolean,"jurisdiction"?: string,"opened_on"?: string,"status"?: Database["public"]['Enums']["matter_status"],"title"?: string,"updated_at"?: string
+                    "area"?: Database["public"]['Enums']["practice_area"],"client_id"?: string,"closed_on"?: string | null,"counterpart"?: string | null,"court"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"file_number"?: string | null,"id"?: string,"is_sensitive"?: boolean,"jurisdiction"?: string,"opened_on"?: string,"organization_id"?: string,"status"?: Database["public"]['Enums']["matter_status"],"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -199,32 +217,84 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "profiles"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "matters_organization_id_fkey"
+      columns: ["organization_id"]
+isOneToOne: false
+      referencedRelation: "organizations"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"memberships": {
+                  Row: {
+                    "created_at": string,"is_active": boolean,"organization_id": string,"role": Database["public"]['Enums']["app_role"],"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"is_active"?: boolean,"organization_id": string,"role"?: Database["public"]['Enums']["app_role"],"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"is_active"?: boolean,"organization_id"?: string,"role"?: Database["public"]['Enums']["app_role"],"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "memberships_organization_id_fkey"
+      columns: ["organization_id"]
+isOneToOne: false
+      referencedRelation: "organizations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "memberships_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
     }
                   ]
                 },"non_working_days": {
                   Row: {
-                    "created_at": string,"day": string,"description": string,"kind": Database["public"]['Enums']["non_working_day_kind"]
+                    "created_at": string,"day": string,"description": string,"kind": Database["public"]['Enums']["non_working_day_kind"],"organization_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"day": string,"description": string,"kind"?: Database["public"]['Enums']["non_working_day_kind"]
+                    "created_at"?: string,"day": string,"description": string,"kind"?: Database["public"]['Enums']["non_working_day_kind"],"organization_id": string
                   }
                   Update: {
-                    "created_at"?: string,"day"?: string,"description"?: string,"kind"?: Database["public"]['Enums']["non_working_day_kind"]
+                    "created_at"?: string,"day"?: string,"description"?: string,"kind"?: Database["public"]['Enums']["non_working_day_kind"],"organization_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "non_working_days_organization_id_fkey"
+      columns: ["organization_id"]
+isOneToOne: false
+      referencedRelation: "organizations"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"organizations": {
+                  Row: {
+                    "created_at": string,"id": string,"name": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"name": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"name"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     
                   ]
                 },"profiles": {
                   Row: {
-                    "created_at": string,"email": string,"full_name": string,"id": string,"is_active": boolean,"professional_registration": string | null,"role": Database["public"]['Enums']["app_role"],"updated_at": string
+                    "created_at": string,"email": string,"full_name": string,"id": string,"professional_registration": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"email": string,"full_name"?: string,"id": string,"is_active"?: boolean,"professional_registration"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"updated_at"?: string
+                    "created_at"?: string,"email": string,"full_name"?: string,"id": string,"professional_registration"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"email"?: string,"full_name"?: string,"id"?: string,"is_active"?: boolean,"professional_registration"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"updated_at"?: string
+                    "created_at"?: string,"email"?: string,"full_name"?: string,"id"?: string,"professional_registration"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     

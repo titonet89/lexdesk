@@ -12,12 +12,12 @@ import { loadEventFormData } from "../data";
 export const metadata: Metadata = { title: "Nuevo evento" };
 
 export default async function NewEventPage({ searchParams }: PageProps<"/panel/agenda/nuevo">) {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const { expediente, fecha } = await searchParams;
   const matterId = typeof expediente === "string" && uuidSchema.safeParse(expediente).success ? expediente : "";
   const date = typeof fecha === "string" && /^\d{4}-\d{2}-\d{2}$/.test(fecha) ? fecha : todayIso();
 
-  const { matters, nonWorkingDays } = await loadEventFormData();
+  const { matters, nonWorkingDays } = await loadEventFormData(organization.organizationId);
 
   return (
     <>

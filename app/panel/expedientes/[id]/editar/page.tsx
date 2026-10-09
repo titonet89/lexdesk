@@ -13,14 +13,14 @@ import { updateMatterAction } from "../../actions";
 export const metadata: Metadata = { title: "Editar expediente" };
 
 export default async function EditMatterPage({ params }: PageProps<"/panel/expedientes/[id]/editar">) {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const { id } = await params;
   if (!uuidSchema.safeParse(id).success) notFound();
 
   const supabase = await createClient();
   const [{ data: matter }, { data: clients }] = await Promise.all([
     supabase.from("matters").select("*").eq("id", id).maybeSingle(),
-    supabase.from("clients").select("id, full_name").order("full_name"),
+    supabase.from("clients").select("id, full_name").eq("organization_id", organization.organizationId).order("full_name"),
   ]);
   if (!matter) notFound();
 

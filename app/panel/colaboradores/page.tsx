@@ -11,16 +11,30 @@ import { setCollaboratorActiveAction } from "./actions";
 export const metadata: Metadata = { title: "Colaboradores" };
 
 export default async function CollaboratorsPage() {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const supabase = await createClient();
-  const [{ data: collaborators }, { data: shares }] = await Promise.all([
+  const [{ data: memberRows }, { data: shares }] = await Promise.all([
     supabase
-      .from("profiles")
-      .select("id, full_name, email, is_active, created_at")
-      .eq("role", "colaborador")
-      .order("full_name"),
-    supabase.from("matter_shares").select("collaborator_id, expires_at").is("revoked_at", null),
+      .from("memberships")
+      .select("user_id, is_active, created_at, profiles(full_name, email)")
+      .eq("organization_id", organization.organizationId)
+      .eq("role", "colaborador"),
+    supabase
+      .from("matter_shares")
+      .select("collaborator_id, expires_at, matters!inner(organization_id)")
+      .eq("matters.organization_id", organization.organizationId)
+      .is("revoked_at", null),
   ]);
+
+  const collaborators = (memberRows ?? [])
+    .map((row) => ({
+      id: row.user_id,
+      full_name: row.profiles?.full_name ?? "",
+      email: row.profiles?.email ?? "",
+      is_active: row.is_active,
+      created_at: row.created_at,
+    }))
+    .sort((a, b) => (a.full_name || a.email).localeCompare(b.full_name || b.email));
 
   const activeShares = new Map<string, number>();
   for (const share of shares ?? []) {
@@ -35,7 +49,7 @@ export default async function CollaboratorsPage() {
         description="Colegas a quienes podés compartir expedientes puntuales para pedir su opinión."
       />
 
-      <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader title="Colegas invitados" description={`${collaborators?.length ?? 0} en total`} />
           {collaborators && collaborators.length > 0 ? (

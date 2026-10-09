@@ -55,7 +55,7 @@ export default async function EventDetailPage({ params }: PageProps<"/panel/agen
         {overdue ? <Badge tone="red">Fecha vencida</Badge> : null}
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card className="space-y-4 p-5 sm:p-6">
           <p className="flex items-start gap-3 text-navy-900">
             <Clock className="mt-0.5 size-5 shrink-0 text-gold-700" aria-hidden="true" />

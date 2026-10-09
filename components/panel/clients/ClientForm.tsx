@@ -28,7 +28,7 @@ export function ClientForm({ action, client, cancelHref }: ClientFormProps) {
       <Card className="space-y-5 p-5 sm:p-6">
         <FormMessage message={state.ok ? null : state.message} />
 
-        <div className="grid gap-5 sm:grid-cols-[1fr_2fr]">
+        <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
           <Field label="Tipo" htmlFor="kind" error={errors.kind}>
             <Select id="kind" name="kind" defaultValue={client?.kind ?? "persona"}>
               {toOptions(clientKindLabels).map((option) => (
@@ -50,7 +50,7 @@ export function ClientForm({ action, client, cancelHref }: ClientFormProps) {
           </Field>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-[1fr_2fr]">
+        <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
           <Field label="Documento" htmlFor="document_type" error={errors.document_type}>
             <Select id="document_type" name="document_type" defaultValue={client?.document_type ?? ""}>
               <option value="">—</option>

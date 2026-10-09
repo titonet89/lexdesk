@@ -1,11 +1,11 @@
-// Crea (una sola vez) el usuario titular del panel.
+// Da de alta un ESTUDIO nuevo con su titular (alta de un cliente de la plataforma).
 //
 // Uso:
-//   npm run admin:crear-titular -- --email titular@ejemplo.com --nombre "Dra. Nombre Apellido"
+//   npm run admin:crear-titular -- --email titular@ejemplo.com --nombre "Dra. Nombre Apellido" --estudio "Estudio Apellido"
 //
-// Genera una contraseña temporal aleatoria que se muestra UNA vez en pantalla.
-// Al ingresar, el sistema exige activar la verificación en dos pasos; después
-// conviene cambiar la contraseña desde Ajustes → Seguridad.
+// - Si el email no tiene cuenta, se crea con una contraseña temporal aleatoria
+//   que se muestra UNA vez. Al ingresar se exige activar la verificación en dos pasos.
+// - Si ya tiene cuenta (p. ej. colabora con otro estudio), se la suma como titular del estudio nuevo.
 //
 // Requiere en el entorno: NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SECRET_KEY.
 
@@ -17,14 +17,18 @@ const { values } = parseArgs({
   options: {
     email: { type: "string" },
     nombre: { type: "string" },
+    estudio: { type: "string" },
   },
 });
 
 const email = values.email?.trim().toLowerCase();
 const fullName = values.nombre?.trim();
+const organizationName = values.estudio?.trim() || (fullName ? `Estudio ${fullName}` : "");
 
 if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !fullName) {
-  console.error('Uso: npm run admin:crear-titular -- --email titular@ejemplo.com --nombre "Dra. Nombre Apellido"');
+  console.error(
+    'Uso: npm run admin:crear-titular -- --email titular@ejemplo.com --nombre "Dra. Nombre Apellido" [--estudio "Estudio Apellido"]',
+  );
   process.exit(1);
 }
 
@@ -37,39 +41,50 @@ if (!url || !secretKey) {
 
 const supabase = createClient(url, secretKey, { auth: { autoRefreshToken: false, persistSession: false } });
 
-const { data: existing, error: existingError } = await supabase
-  .from("profiles")
-  .select("id, email")
-  .eq("role", "titular")
-  .limit(1);
+const { data: existing } = await supabase.from("profiles").select("id").eq("email", email).maybeSingle();
+let userId = existing?.id ?? null;
+let temporaryPassword = null;
 
-if (existingError) {
-  console.error("No se pudo consultar la base:", existingError.message);
-  process.exit(1);
-}
-if (existing.length > 0) {
-  console.error(`Ya existe un usuario titular (${existing[0].email}). No se crea otro.`);
-  process.exit(1);
-}
-
-// Contraseña temporal que cumple la política: mayúsculas, minúsculas y números.
-const temporaryPassword = `Tmp-${randomBytes(12).toString("base64url")}9aZ`;
-
-const { data, error } = await supabase.auth.admin.createUser({
-  email,
-  password: temporaryPassword,
-  email_confirm: true,
-  app_metadata: { role: "titular" },
-  user_metadata: { full_name: fullName },
-});
-
-if (error) {
-  console.error("No se pudo crear el usuario:", error.message);
-  process.exit(1);
+if (!userId) {
+  // Contraseña temporal que cumple la política: mayúsculas, minúsculas y números.
+  temporaryPassword = `Tmp-${randomBytes(12).toString("base64url")}9aZ`;
+  const { data, error } = await supabase.auth.admin.createUser({
+    email,
+    password: temporaryPassword,
+    email_confirm: true,
+    user_metadata: { full_name: fullName },
+  });
+  if (error) {
+    console.error("No se pudo crear el usuario:", error.message);
+    process.exit(1);
+  }
+  userId = data.user.id;
 }
 
-console.log("\nUsuario titular creado:");
-console.log(`  Email:                ${data.user.email}`);
-console.log(`  Contraseña temporal:  ${temporaryPassword}`);
-console.log("\nGuardala en un lugar seguro: no se vuelve a mostrar.");
-console.log("Al ingresar se pedirá activar la verificación en dos pasos.\n");
+const { data: organization, error: orgError } = await supabase
+  .from("organizations")
+  .insert({ name: organizationName })
+  .select("id")
+  .single();
+if (orgError) {
+  console.error("No se pudo crear el estudio:", orgError.message);
+  process.exit(1);
+}
+
+const { error: membershipError } = await supabase
+  .from("memberships")
+  .insert({ organization_id: organization.id, user_id: userId, role: "titular" });
+if (membershipError) {
+  console.error("No se pudo asignar la titular:", membershipError.message);
+  process.exit(1);
+}
+
+console.log(`\nEstudio "${organizationName}" creado.`);
+console.log(`  Titular:              ${email}`);
+if (temporaryPassword) {
+  console.log(`  Contraseña temporal:  ${temporaryPassword}`);
+  console.log("\nGuardala en un lugar seguro: no se vuelve a mostrar.");
+  console.log("Al ingresar se pedirá activar la verificación en dos pasos.\n");
+} else {
+  console.log("  (La cuenta ya existía: ingresa con su contraseña actual.)\n");
+}

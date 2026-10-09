@@ -90,9 +90,9 @@ async function CollaboratorHome({ displayName }: { displayName: string }) {
 }
 
 export default async function PanelHomePage() {
-  const { profile } = await requireMember();
+  const { profile, active: organization } = await requireMember();
   const displayName = profile.full_name || profile.email;
-  if (profile.role !== "titular") return <CollaboratorHome displayName={displayName} />;
+  if (organization.role !== "titular") return <CollaboratorHome displayName={displayName} />;
 
   const supabase = await createClient();
   const now = nowInZone();
@@ -100,11 +100,12 @@ export default async function PanelHomePage() {
   const in14Days = addDays(now, 14).toISOString();
 
   const [activeMatters, clients, weekDeadlines, weekHearings, upcoming, overdue, latestEntries] = await Promise.all([
-    supabase.from("matters").select("id", { count: "exact", head: true }).in("status", ["activo", "en_espera"]),
-    supabase.from("clients").select("id", { count: "exact", head: true }).is("archived_at", null),
+    supabase.from("matters").select("id", { count: "exact", head: true }).eq("organization_id", organization.organizationId).in("status", ["activo", "en_espera"]),
+    supabase.from("clients").select("id", { count: "exact", head: true }).eq("organization_id", organization.organizationId).is("archived_at", null),
     supabase
       .from("events")
       .select("id", { count: "exact", head: true })
+      .eq("organization_id", organization.organizationId)
       .eq("kind", "vencimiento")
       .eq("status", "pendiente")
       .gte("starts_at", now.toISOString())
@@ -112,6 +113,7 @@ export default async function PanelHomePage() {
     supabase
       .from("events")
       .select("id", { count: "exact", head: true })
+      .eq("organization_id", organization.organizationId)
       .eq("kind", "audiencia")
       .eq("status", "pendiente")
       .gte("starts_at", now.toISOString())
@@ -119,6 +121,7 @@ export default async function PanelHomePage() {
     supabase
       .from("events")
       .select("id, title, kind, priority, starts_at, all_day, matters(id, title)")
+      .eq("organization_id", organization.organizationId)
       .eq("status", "pendiente")
       .gte("starts_at", now.toISOString())
       .lte("starts_at", in14Days)
@@ -127,6 +130,7 @@ export default async function PanelHomePage() {
     supabase
       .from("events")
       .select("id, title, kind, starts_at, matters(id, title)")
+      .eq("organization_id", organization.organizationId)
       .eq("status", "pendiente")
       .in("kind", ["vencimiento", "audiencia", "tramite"])
       .lt("starts_at", now.toISOString())
@@ -134,7 +138,8 @@ export default async function PanelHomePage() {
       .limit(10),
     supabase
       .from("matter_entries")
-      .select("id, summary, kind, occurred_on, matters(id, title)")
+      .select("id, summary, kind, occurred_on, matters!inner(id, title, organization_id)")
+      .eq("matters.organization_id", organization.organizationId)
       .order("created_at", { ascending: false })
       .limit(6),
   ]);
@@ -189,7 +194,7 @@ export default async function PanelHomePage() {
         </Card>
       ) : null}
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[3fr_2fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <Card>
           <CardHeader
             title="Próximos 14 días"

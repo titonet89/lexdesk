@@ -19,7 +19,7 @@ const actionTones: Record<string, "green" | "blue" | "red" | "gold" | "neutral">
 };
 
 export default async function AuditPage({ searchParams }: PageProps<"/panel/ajustes/auditoria">) {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const { tabla } = await searchParams;
   const table = typeof tabla === "string" && tabla in auditTableLabels ? tabla : undefined;
 
@@ -27,6 +27,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/panel/ajus
   let request = supabase
     .from("audit_log")
     .select("id, occurred_at, actor_id, action, table_name, record_id, changed_columns")
+    .eq("organization_id", organization.organizationId)
     .order("occurred_at", { ascending: false })
     .limit(200);
   if (table) request = request.eq("table_name", table);

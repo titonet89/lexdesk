@@ -30,7 +30,7 @@ function parseEvent(formData: FormData) {
   });
 }
 
-function toRow(data: NonNullable<ReturnType<typeof parseEvent>["data"]>): EventInsert {
+function toRow(data: NonNullable<ReturnType<typeof parseEvent>["data"]>): Omit<EventInsert, "organization_id"> {
   const startsAt = data.all_day ? zonedInputToIso(data.date, "00:00") : zonedInputToIso(data.date, data.start_time);
   const endsAt = data.all_day
     ? null
@@ -60,13 +60,14 @@ function revalidateAgenda(matterId?: string | null) {
 }
 
 export async function createEventAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  if (!(await getTitularOrNull())) return actionError("No autorizado.");
+  const session = await getTitularOrNull();
+  if (!session) return actionError("No autorizado.");
   const parsed = parseEvent(formData);
   if (!parsed.success) return actionError("Revisá los datos marcados.", zodFieldErrors(parsed.error));
 
   const supabase = await createClient();
   const row = toRow(parsed.data);
-  const { data, error } = await supabase.from("events").insert(row).select("id").single();
+  const { data, error } = await supabase.from("events").insert({ ...row, organization_id: session.active.organizationId }).select("id").single();
   if (error || !data) return actionError(GENERIC_ERROR);
 
   revalidateAgenda(row.matter_id);

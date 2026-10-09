@@ -45,7 +45,8 @@ export async function updateProfileAction(_prev: ActionState, formData: FormData
 }
 
 export async function addNonWorkingDaysAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  if (!(await getTitularOrNull())) return actionError("No autorizado.");
+  const session = await getTitularOrNull();
+  if (!session) return actionError("No autorizado.");
   const parsed = nonWorkingDaySchema.safeParse({
     from: formText(formData, "from"),
     to: formText(formData, "to"),
@@ -55,17 +56,18 @@ export async function addNonWorkingDaysAction(_prev: ActionState, formData: Form
   if (!parsed.success) return actionError("Revisá los datos marcados.", zodFieldErrors(parsed.error));
 
   const { from, to, kind, description } = parsed.data;
-  const rows: { day: string; kind: typeof kind; description: string }[] = [];
+  const organizationId = session.active.organizationId;
+  const rows: { organization_id: string; day: string; kind: typeof kind; description: string }[] = [];
   const end = parseDateOnly(to ?? from);
   for (let cursor = parseDateOnly(from); cursor <= end; cursor = addDays(cursor, 1)) {
-    rows.push({ day: toDateOnly(cursor), kind, description });
+    rows.push({ organization_id: organizationId, day: toDateOnly(cursor), kind, description });
     if (rows.length > MAX_RANGE_DAYS) {
       return actionError(`El rango no puede superar ${MAX_RANGE_DAYS} días.`, { to: "Rango demasiado largo." });
     }
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.from("non_working_days").upsert(rows, { onConflict: "day" });
+  const { error } = await supabase.from("non_working_days").upsert(rows, { onConflict: "organization_id,day" });
   if (error) return actionError(GENERIC_ERROR);
 
   revalidatePath("/panel/ajustes/feriados");
@@ -74,10 +76,11 @@ export async function addNonWorkingDaysAction(_prev: ActionState, formData: Form
 }
 
 export async function deleteNonWorkingDayAction(day: string): Promise<void> {
-  if (!(await getTitularOrNull())) return;
+  const session = await getTitularOrNull();
+  if (!session) return;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return;
   const supabase = await createClient();
-  await supabase.from("non_working_days").delete().eq("day", day);
+  await supabase.from("non_working_days").delete().eq("organization_id", session.active.organizationId).eq("day", day);
   revalidatePath("/panel/ajustes/feriados");
   revalidatePath("/panel/agenda");
 }

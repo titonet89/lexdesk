@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = { title: "Clientes" };
 
 export default async function ClientsPage({ searchParams }: PageProps<"/panel/clientes">) {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const params = await searchParams;
   const query = sanitizeSearch(params.q);
   const showArchived = params.archivados === "1";
@@ -19,6 +19,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/panel/cl
   let request = supabase
     .from("clients")
     .select("id, full_name, kind, document_type, document_number, phone, locality, archived_at, matters(count)")
+    .eq("organization_id", organization.organizationId)
     .order("full_name")
     .limit(200);
   request = showArchived ? request.not("archived_at", "is", null) : request.is("archived_at", null);

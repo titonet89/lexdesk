@@ -21,7 +21,7 @@ export function EntryForm({ matterId, today }: { matterId: string; today: string
     <form ref={formRef} action={formAction} noValidate className="space-y-4" data-testid="entry-form">
       <input type="hidden" name="matter_id" value={matterId} />
       <FormMessage message={state.message} tone={state.ok ? "success" : "error"} />
-      <div className="grid gap-4 sm:grid-cols-[10rem_12rem_1fr]">
+      <div className="grid gap-4 sm:grid-cols-[10rem_12rem_minmax(0,1fr)]">
         <Field label="Fecha" htmlFor="entry-date" error={errors.occurred_on}>
           <Input id="entry-date" name="occurred_on" type="date" defaultValue={today} />
         </Field>

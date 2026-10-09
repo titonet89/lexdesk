@@ -18,6 +18,10 @@ La seguridad se diseña en capas: si una falla, las otras siguen protegiendo.
 
 ## 2. Autorización (en la base de datos)
 
+- **Aislamiento entre estudios (multi-tenant):** toda fila pertenece a un estudio y las políticas
+  RLS solo devuelven datos de los estudios donde la persona es miembro activo. Triggers impiden
+  que un expediente o evento apunte a datos de otro estudio. Probado con pgTAP (estudio A vs. B).
+- Las membresías solo las crea o modifica el servidor tras verificar a la titular del estudio.
 - **Row Level Security** en todas las tablas: la regla de quién ve qué vive en Postgres.
   Aunque la aplicación tuviera un error, un colaborador no puede leer lo que no le compartieron.
 - Funciones de autorización `SECURITY DEFINER` con `search_path` vacío, en un esquema
@@ -64,5 +68,5 @@ La seguridad se diseña en capas: si una falla, las otras siguen protegiendo.
 - [ ] Migraciones aplicadas (`npx supabase db push`).
 - [ ] SMTP propio configurado para los emails de autenticación.
 - [ ] Variables de entorno en Vercel (la service role key solo en el servidor).
-- [ ] Usuario titular creado con `npm run admin:crear-titular`.
+- [ ] Estudio y titular creados con `npm run admin:crear-titular`.
 - [ ] Pruebas E2E en verde contra el entorno de staging.

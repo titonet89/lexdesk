@@ -28,7 +28,7 @@ export function NonWorkingDayForm() {
           <Input id="nw-to" name="to" type="date" />
         </Field>
       </div>
-      <div className="grid gap-4 sm:grid-cols-[1fr_2fr]">
+      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <Field label="Tipo" htmlFor="nw-kind" error={errors.kind}>
           <Select id="nw-kind" name="kind" defaultValue="feriado">
             {toOptions(nonWorkingDayKindLabels).map((option) => (

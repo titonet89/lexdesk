@@ -29,7 +29,7 @@ type EventKind = (typeof Constants.public.Enums.event_kind)[number];
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 export default async function AgendaPage({ searchParams }: PageProps<"/panel/agenda">) {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const params = await searchParams;
 
   const today = todayIso();
@@ -47,6 +47,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
   let request = supabase
     .from("events")
     .select("id, title, kind, priority, status, starts_at, all_day, location, matters(title)")
+    .eq("organization_id", organization.organizationId)
     .gte("starts_at", zonedInputToIso(toDateOnly(gridStart), "00:00"))
     .lte("starts_at", zonedInputToIso(toDateOnly(gridEnd), "23:59"))
     .order("starts_at");
@@ -58,6 +59,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
     supabase
       .from("non_working_days")
       .select("day, description, kind")
+      .eq("organization_id", organization.organizationId)
       .gte("day", toDateOnly(gridStart))
       .lte("day", toDateOnly(gridEnd)),
   ]);

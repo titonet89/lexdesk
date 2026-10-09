@@ -13,11 +13,12 @@ import { deleteNonWorkingDayAction } from "../actions";
 export const metadata: Metadata = { title: "Feriados" };
 
 export default async function NonWorkingDaysPage() {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const supabase = await createClient();
   const { data: days } = await supabase
     .from("non_working_days")
     .select("day, kind, description")
+    .eq("organization_id", organization.organizationId)
     .gte("day", `${todayIso().slice(0, 4)}-01-01`)
     .order("day");
 
@@ -34,7 +35,7 @@ export default async function NonWorkingDaysPage() {
         }
       />
 
-      <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader title={`Días inhábiles desde ${todayIso().slice(0, 4)}`} description={`${days?.length ?? 0} cargados`} />
           {days && days.length > 0 ? (

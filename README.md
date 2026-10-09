@@ -42,6 +42,7 @@ documentos y colaboración segura entre colegas.
 | **Documentos** | Almacenamiento privado, URLs firmadas de 60 s y registro de cada descarga. |
 | **Colaboración** | Compartir un expediente puntual con un colega (lectura o comentarios, con vencimiento opcional). |
 | **Auditoría** | Quién creó, modificó, borró, vio o descargó qué y cuándo. |
+| **Multi-estudio** | Cada estudio con sus datos aislados; un colega puede colaborar con varios estudios y cambiar entre ellos. |
 
 <p align="center">
   <img src="docs/screenshots/sitio-publico.png" alt="Sitio público del estudio" width="66%" />
@@ -57,9 +58,10 @@ documentos y colaboración segura entre colegas.
 
 El sistema guarda información amparada por el secreto profesional y **datos sensibles** (Ley 25.326), así que la seguridad se diseñó en capas:
 
+- **Aislamiento multi-estudio (multi-tenant):** cada fila pertenece a un estudio; RLS y triggers garantizan que ningún estudio vea ni referencie datos de otro.
 - **Autorización en la base de datos (RLS):** cada tabla tiene políticas de Row Level Security. Aunque la aplicación tuviera un error, un colaborador no puede leer lo que no se le compartió.
 - **2FA obligatorio (TOTP):** sin nivel de autenticación `aal2` la base no devuelve datos.
-- **Sin registro público:** los usuarios solo existen por invitación; los roles no se pueden auto-asignar.
+- **Sin registro público:** los usuarios solo existen por invitación; los roles viven en membresías que solo modifica el servidor.
 - **Expedientes sensibles:** no se pueden compartir, y marcarlos revoca los accesos existentes (trigger en Postgres).
 - **Mínimo privilegio:** los colaboradores nunca ven datos de clientes ni la agenda; la clave de servicio solo existe en el servidor (`server-only`).
 - **Encabezados:** CSP estricta, HSTS, `X-Frame-Options: DENY`, `nosniff`, `Permissions-Policy`.
@@ -104,8 +106,8 @@ Más detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 | Suite | Qué verifica |
 |---|---|
-| `npm run test:db` | **27 pruebas pgTAP** de RLS: anónimo, titular sin/con 2FA, colaborador con y sin acceso, accesos vencidos y revocados. |
-| `npx playwright test` | Flujo completo: login, alta obligatoria de 2FA, expedientes, documentos, agenda, invitación de un colega por email, comentarios y revocación. Sitio público en móvil y escritorio. Cómputo de plazos procesales. |
+| `npm run test:db` | **39 pruebas pgTAP** de RLS: aislamiento entre estudios, anónimo, titular sin/con 2FA, colaborador en varios estudios, accesos vencidos y revocados, borrado en cascada. |
+| `npx playwright test` | Flujo completo: login, alta obligatoria de 2FA, expedientes, documentos, agenda, invitación de un colega por email, comentarios, revocación y aislamiento entre dos estudios. Sitio público en móvil y escritorio. Cómputo de plazos procesales. |
 
 ## 🚀 Correr el proyecto
 
@@ -143,7 +145,7 @@ docs/                    arquitectura y estrategia de seguridad
 
 ## 🗺️ Roadmap
 
-- [ ] Multi-estudio (SaaS): datos aislados por organización.
+- [x] Multi-estudio (SaaS): datos aislados por organización.
 - [ ] Modo oscuro, paleta de comandos (Ctrl+K) y acciones rápidas globales.
 - [ ] Vista Kanban de expedientes por etapa procesal y vista semanal de agenda.
 - [ ] Honorarios y gastos por expediente.

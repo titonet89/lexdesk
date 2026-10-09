@@ -19,16 +19,21 @@ export async function recreateUser(email: string, password: string, role: "titul
   if (existing) {
     // Los datos del usuario anterior se eliminan para que cada corrida empiece limpia.
     await admin.from("matter_comments").delete().eq("author_id", existing.id);
+    const { data: owned } = await admin.from("memberships").select("organization_id").eq("user_id", existing.id).eq("role", "titular");
+    for (const row of owned ?? []) await admin.from("organizations").delete().eq("id", row.organization_id);
     await admin.auth.admin.deleteUser(existing.id);
   }
   const { data, error } = await admin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
-    app_metadata: { role },
     user_metadata: { full_name: fullName },
   });
   if (error || !data.user) throw new Error(`No se pudo crear ${email}: ${error?.message}`);
+  if (role === "titular") {
+    const { data: organization } = await admin.from("organizations").insert({ name: `Estudio ${fullName}` }).select("id").single();
+    await admin.from("memberships").insert({ organization_id: organization!.id, user_id: data.user.id, role: "titular" });
+  }
   return data.user.id;
 }
 

@@ -11,8 +11,9 @@ de consultas y panel privado de gestión del estudio.
 | 2 | Base del sistema: base de datos, seguridad (RLS), login con 2FA, panel | Hecho (local) |
 | 3 | Módulos: clientes, expedientes, actuaciones, agenda/plazos, documentos | Hecho (local) |
 | 4 | Colaboración: compartir expedientes con colegas (lectura / comentarios) | Hecho (local) |
-| 5 | Recordatorios por email, honorarios y pagos, consultas web al panel | Pendiente |
-| 6 | Portal de clientes (opcional) | Pendiente |
+| 5 | Multi-estudio (SaaS): datos aislados por organización y membresías | Hecho (local) |
+| 6 | Recordatorios por email, honorarios y pagos, consultas web al panel | Pendiente |
+| 7 | Portal de clientes (opcional) | Pendiente |
 
 ## Stack
 
@@ -35,6 +36,10 @@ de consultas y panel privado de gestión del estudio.
 ## Modelo de datos
 
 ```
+organizations ──< memberships >── profiles      (rol POR estudio: titular | colaborador)
+      │
+      ├──< clients, matters, events, non_working_days, audit_log   (organization_id)
+      │
 profiles ──< matter_shares >── matters ──< matter_entries
                                   │  └───< matter_comments
 clients ──────────────────────────┤  └───< documents  (archivo en Storage: expedientes/{matter_id}/...)
@@ -43,7 +48,10 @@ non_working_days  (feriados / ferias judiciales para el cómputo de plazos)
 audit_log         (registro de cambios y accesos)
 ```
 
-- **Titular**: acceso total.
+- **Multi-estudio**: cada estudio (organización) tiene sus datos aislados por RLS. El rol no es del
+  usuario sino de su **membresía** en cada estudio: un colega puede colaborar con varios estudios y
+  cambiar entre ellos desde el panel; desactivarlo en uno no lo afecta en los demás.
+- **Titular**: acceso total a los datos de su estudio.
 - **Colaborador**: solo ve los expedientes que la titular le comparte, por un plazo opcional,
   en modo *lectura* o *comentario*, con o sin documentos. No ve datos de clientes ni la agenda.
 - Un expediente marcado como **sensible** (p. ej. violencia de género) no puede compartirse;

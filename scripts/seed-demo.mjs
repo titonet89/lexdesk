@@ -97,6 +97,25 @@ await insert("events", [
   { title: "Renovar matrícula profesional", kind: "recordatorio", starts_at: at(20, 9), all_day: true, created_by: owner, organization_id: org },
 ]);
 
+// Honorarios y gastos (UMA de referencia: $ 55.786).
+const UMA = 55786;
+const [feeAlimentos, , feeSucesion, feeConsulta, gastoCedulas] = await insert("matter_charges", [
+  { matter_id: m1, kind: "honorario", concept: "Alimentos (15 UMA)", amount: 15 * UMA, uma_quantity: 15, uma_value: UMA, charged_on: dateOnly(-55), created_by: owner },
+  { matter_id: m1, kind: "gasto", concept: "Tasa de justicia", amount: 45000, charged_on: dateOnly(-58), created_by: owner },
+  { matter_id: m2, kind: "honorario", concept: "Honorarios 20% s/ inventario ($ 38.000.000)", amount: 7600000, charged_on: dateOnly(-20), due_on: dateOnly(-5), created_by: owner },
+  { matter_id: m3, kind: "honorario", concept: "Consulta escrita (8 UMA)", amount: 8 * UMA, uma_quantity: 8, uma_value: UMA, charged_on: dateOnly(-30), created_by: owner },
+  { matter_id: m4, kind: "gasto", concept: "Cédulas y copias certificadas", amount: 18500, charged_on: dateOnly(-12), created_by: owner },
+]);
+const charges = await admin.from("matter_charges").select("id, concept").in("matter_id", [m1]);
+const tasa = charges.data.find((row) => row.concept === "Tasa de justicia").id;
+await insert("charge_payments", [
+  { charge_id: feeAlimentos, amount: 400000, paid_on: dateOnly(-40), method: "transferencia", created_by: owner },
+  { charge_id: tasa, amount: 45000, paid_on: dateOnly(-58), method: "efectivo", created_by: owner },
+  { charge_id: feeSucesion, amount: 1500000, paid_on: dateOnly(-18), method: "transferencia", created_by: owner },
+  { charge_id: feeConsulta, amount: 8 * UMA, paid_on: dateOnly(-30), method: "transferencia", created_by: owner },
+]);
+void gastoCedulas;
+
 const year = new Date().getUTCFullYear();
 await admin.from("non_working_days").upsert(
   [

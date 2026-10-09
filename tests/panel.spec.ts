@@ -206,6 +206,76 @@ test.describe("gestión del estudio", () => {
     await expect(page.getByTestId("entries-list")).toContainText("Cambio de etapa: Prueba → Sentencia");
   });
 
+  test("honorarios: cálculo desde el arancel, pagos parciales y saldo", async () => {
+    const page = titularPage;
+    await page.goto(`${matterUrl}?seccion=honorarios`);
+    const form = page.getByTestId("charge-form");
+
+    // Desde el arancel: Divorcio = 16 UMA × $ 55.786.
+    await form.getByLabel("Actividad del arancel").selectOption({ label: "Divorcio — mín. 16 UMA" });
+    await expect(form.getByLabel("Concepto")).toHaveValue("Divorcio (16 UMA)");
+    await expect(form.getByLabel("Monto ($)")).toHaveValue("892.576,00");
+    await form.getByLabel("Cantidad de UMA").fill("10");
+    await expect(form.getByTestId("fee-calculator").getByRole("alert")).toContainText("Por debajo del mínimo");
+    await form.getByLabel("Cantidad de UMA").fill("16");
+    await form.getByRole("button", { name: "Registrar honorario" }).click();
+    const list = page.getByTestId("charges-list");
+    const charge = list.getByRole("listitem").filter({ hasText: "Divorcio (16 UMA)" }).first();
+    await expect(charge).toContainText("Pendiente");
+    await expect(charge).toContainText("16 UMA × $ 55.786,00");
+
+    // Gasto con monto libre.
+    await form.getByLabel("Tipo").selectOption("gasto");
+    await form.getByLabel("Concepto").fill("Tasa de justicia");
+    await form.getByLabel("Monto ($)").fill("45.000");
+    await form.getByRole("button", { name: "Registrar gasto" }).click();
+    await expect(list).toContainText("Tasa de justicia");
+
+    // Pago parcial, intento de pagar de más y cancelación.
+    const openPayment = async () => {
+      if (!(await charge.getByTestId("payment-form").isVisible())) await charge.locator("summary", { hasText: "Registrar pago" }).click();
+    };
+    await openPayment();
+    await charge.getByLabel("Monto cobrado ($)").fill("400.000");
+    await charge.getByRole("button", { name: "Registrar pago" }).click();
+    await expect(charge).toContainText("Pago parcial");
+    await openPayment();
+    await charge.getByLabel("Monto cobrado ($)").fill("600.000");
+    await charge.getByRole("button", { name: "Registrar pago" }).click();
+    await expect(charge.getByTestId("payment-form").getByRole("alert")).toContainText("supera el saldo");
+    await charge.getByLabel("Monto cobrado ($)").fill("492.576");
+    await charge.getByRole("button", { name: "Registrar pago" }).click();
+    await expect(charge).toContainText("Pagado");
+
+    // Resumen: solo queda pendiente la tasa de justicia.
+    await expect(page.getByTestId("fees-summary")).toContainText("$ 45.000,00");
+    await page.goto("/panel/honorarios");
+    await expect(page.getByTestId("receivables-list")).toContainText("Tasa de justicia");
+    await expect(page.getByTestId("receivables-list")).not.toContainText("Divorcio (16 UMA)");
+  });
+
+  test("el arancel y la UMA son editables y se pueden restaurar", async () => {
+    const page = titularPage;
+    await page.goto("/panel/ajustes/honorarios");
+    await expect(page.getByTestId("uma-current")).toHaveText("$ 55.786,00");
+
+    const umaForm = page.getByTestId("uma-form");
+    await umaForm.getByLabel("Nuevo valor ($)").fill("60.000");
+    await umaForm.getByRole("button", { name: "Guardar valor" }).click();
+    await expect(page.getByTestId("uma-current")).toHaveText("$ 60.000,00");
+
+    const divorcio = page.getByTestId("schedule-item").filter({ hasText: /^Divorcio/ });
+    await divorcio.getByText("Editar").click();
+    await divorcio.getByLabel("Mínimo (UMA)").fill("18");
+    await divorcio.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect(divorcio).toContainText("18 UMA");
+    await expect(divorcio).toContainText("$ 1.080.000,00");
+
+    await page.getByRole("button", { name: "Restaurar valores de la ley" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Restaurar" }).click();
+    await expect(page.getByTestId("schedule-item").filter({ hasText: /^Divorcio/ })).toContainText("16 UMA");
+  });
+
   test("la paleta de comandos busca y navega con el teclado", async () => {
     const page = titularPage;
     await page.goto("/panel");
@@ -352,6 +422,7 @@ test.describe("gestión del estudio", () => {
     // No ve la agenda ni los documentos (no se incluyeron), ni el vínculo al cliente.
     await expect(colleague.getByRole("link", { name: "Agenda", exact: true })).toHaveCount(0);
     await expect(colleague.getByRole("link", { name: "Documentos" })).toHaveCount(0);
+    await expect(colleague.getByRole("link", { name: "Honorarios" })).toHaveCount(0);
     await expect(colleague.getByRole("link", { name: CLIENT })).toHaveCount(0);
 
     await colleague.getByRole("link", { name: "Observaciones" }).click();

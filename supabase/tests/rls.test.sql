@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(42);
+select plan(53);
 
 -- ---------------------------------------------------------------------------
 -- Datos de prueba (como superusuario): dos estudios, A y B.
@@ -205,6 +205,48 @@ update public.matters set stage = 'sentencia' where id = 'd0000000-0000-0000-000
 reset role;
 select is((select stage::text from public.matters where id = 'd0000000-0000-0000-0000-0000000000a1'), 'prueba',
   'Un colega no puede cambiar la etapa procesal');
+
+-- ---------------------------------------------------------------------------
+-- Honorarios y gastos
+-- ---------------------------------------------------------------------------
+select is((select count(*)::int from public.fee_schedule_items where organization_id = 'aaaa0000-0000-0000-0000-00000000000a'), 43,
+  'Un estudio nuevo nace con el arancel de la Ley 6368 precargado');
+select is((select value from public.uma_values where organization_id = 'aaaa0000-0000-0000-0000-00000000000a'), 55786.00::numeric,
+  'Un estudio nuevo nace con la UMA vigente');
+
+insert into public.matter_charges (id, matter_id, kind, concept, amount)
+values ('e0000000-0000-0000-0000-0000000000a1', 'd0000000-0000-0000-0000-0000000000a1', 'honorario', 'Divorcio (16 UMA)', 892576);
+
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated","aal":"aal2"}', true);
+select lives_ok(
+  $$insert into public.charge_payments (charge_id, amount) values ('e0000000-0000-0000-0000-0000000000a1', 400000)$$,
+  'Titular: registra un pago parcial');
+select is((select status from public.charge_balances where charge_id = 'e0000000-0000-0000-0000-0000000000a1'), 'parcial',
+  'Con un pago parcial el cargo queda "parcial"');
+select throws_ok(
+  $$insert into public.charge_payments (charge_id, amount) values ('e0000000-0000-0000-0000-0000000000a1', 500000)$$,
+  'P0001', null, 'No se puede cobrar más que el saldo');
+select throws_ok(
+  $$update public.matter_charges set amount = 100000 where id = 'e0000000-0000-0000-0000-0000000000a1'$$,
+  'P0001', null, 'El monto no puede quedar por debajo de lo cobrado');
+select lives_ok(
+  $$insert into public.charge_payments (charge_id, amount) values ('e0000000-0000-0000-0000-0000000000a1', 492576)$$,
+  'Titular: cancela el saldo');
+select is((select status from public.charge_balances where charge_id = 'e0000000-0000-0000-0000-0000000000a1'), 'pagado',
+  'Saldado el total, el cargo queda "pagado"');
+select is((select count(*)::int from public.fee_schedule_items where organization_id = 'bbbb0000-0000-0000-0000-00000000000b'), 0,
+  'Titular A: no ve el arancel del estudio B');
+reset role;
+
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated","aal":"aal2"}', true);
+select is((select count(*)::int from public.matter_charges) + (select count(*)::int from public.charge_balances), 0,
+  'Colega: NO ve honorarios ni gastos');
+select throws_ok(
+  $$select public.restore_fee_schedule('aaaa0000-0000-0000-0000-00000000000a')$$,
+  'P0001', null, 'Solo la titular puede restaurar el arancel');
+reset role;
 
 -- Eliminar un estudio borra en cascada todos sus datos (y nada de otros estudios).
 delete from public.organizations where id = 'aaaa0000-0000-0000-0000-00000000000a';

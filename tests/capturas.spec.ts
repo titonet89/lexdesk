@@ -54,8 +54,14 @@ test("capturas del README", async ({ browser }) => {
   await page.goto("/panel/expedientes");
   await page.getByRole("link", { name: /Gómez, Carolina/ }).click();
   await page.waitForURL(/expedientes\/[0-9a-f-]+$/);
-  await page.goto(`${page.url()}?seccion=actuaciones`);
+  const matterUrl = page.url();
+  await page.goto(`${matterUrl}?seccion=actuaciones`);
   await page.screenshot({ path: `${DIR}/panel-expediente.png` });
+  await page.goto(`${matterUrl}?seccion=honorarios`);
+  await page.getByLabel("Actividad del arancel").selectOption({ label: "Alimentos, capacidad de las personas y régimen de comunicación — mín. 15 UMA" });
+  await page.screenshot({ path: `${DIR}/panel-honorarios.png`, fullPage: true });
+  await page.goto("/panel/ajustes/honorarios");
+  await page.screenshot({ path: `${DIR}/panel-arancel.png` });
 
   await page.goto("/panel/agenda/nuevo");
   await page.getByLabel("Título").fill("Contestar demanda");

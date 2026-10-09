@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarOff, ChevronRight, FileClock, ShieldCheck, type LucideIcon } from "lucide-react";
+import { CalendarOff, ChevronRight, FileClock, ShieldCheck, Wallet, type LucideIcon } from "lucide-react";
 import { PageHeader } from "@/components/panel/ui";
 import { requireTitular } from "@/lib/auth/session";
 
@@ -20,6 +20,12 @@ const items: { href: string; title: string; description: string; icon: LucideIco
     icon: CalendarOff,
   },
   {
+    href: "/panel/ajustes/honorarios",
+    title: "Arancel y UMA",
+    description: "Valor de la UMA y honorarios de referencia (Ley 6368 de Jujuy), editables.",
+    icon: Wallet,
+  },
+  {
     href: "/panel/ajustes/auditoria",
     title: "Auditoría",
     description: "Registro de altas, cambios, bajas y accesos a la información.",
@@ -32,7 +38,7 @@ export default async function SettingsPage() {
   return (
     <>
       <PageHeader title="Ajustes" />
-      <ul className="grid gap-4 md:grid-cols-3">
+      <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {items.map(({ href, title, description, icon: Icon }) => (
           <li key={href}>
             <Link

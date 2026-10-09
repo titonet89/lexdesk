@@ -9,7 +9,7 @@ import {
   Gavel,
   Plus,
   TriangleAlert,
-  Users,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { Badge, Card, CardHeader, EmptyState, PageHeader } from "@/components/panel/ui";
@@ -22,13 +22,14 @@ import {
   eventKindTones,
   sharePermissionLabels,
 } from "@/lib/panel/labels";
+import { formatARS, roundMoney } from "@/lib/panel/money";
 import { firstName } from "@/lib/panel/names";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Inicio" };
 
-function Stat({ icon: Icon, label, value, href, alert }: { icon: LucideIcon; label: string; value: number; href: string; alert?: boolean }) {
+function Stat({ icon: Icon, label, value, href, alert }: { icon: LucideIcon; label: string; value: number | string; href: string; alert?: boolean }) {
   return (
     <Link
       href={href}
@@ -37,7 +38,7 @@ function Stat({ icon: Icon, label, value, href, alert }: { icon: LucideIcon; lab
       <span className={cn("grid size-10 place-items-center rounded-xl", alert ? "bg-danger-soft text-danger-ink" : "bg-accent-soft text-accent-ink")}>
         <Icon className="size-5" aria-hidden="true" />
       </span>
-      <p className="mt-4 font-serif text-4xl leading-none text-ink tabular-nums">{value}</p>
+      <p className={cn("mt-4 font-serif leading-none text-ink tabular-nums", typeof value === "string" ? "text-xl sm:text-2xl lg:text-[1.65rem]" : "text-4xl")}>{value}</p>
       <p className="mt-1.5 text-sm text-ink-muted">{label}</p>
     </Link>
   );
@@ -99,9 +100,13 @@ export default async function PanelHomePage() {
   const in7Days = addDays(now, 7).toISOString();
   const in14Days = addDays(now, 14).toISOString();
 
-  const [activeMatters, clients, weekDeadlines, weekHearings, upcoming, overdue, latestEntries] = await Promise.all([
+  const [activeMatters, receivables, weekDeadlines, weekHearings, upcoming, overdue, latestEntries] = await Promise.all([
     supabase.from("matters").select("id", { count: "exact", head: true }).eq("organization_id", organization.organizationId).in("status", ["activo", "en_espera"]),
-    supabase.from("clients").select("id", { count: "exact", head: true }).eq("organization_id", organization.organizationId).is("archived_at", null),
+    supabase
+      .from("charge_balances")
+      .select("balance, matters!inner(organization_id)")
+      .eq("matters.organization_id", organization.organizationId)
+      .neq("status", "pagado"),
     supabase
       .from("events")
       .select("id", { count: "exact", head: true })
@@ -167,7 +172,12 @@ export default async function PanelHomePage() {
         <Stat icon={FolderOpen} label="Expedientes en curso" value={activeMatters.count ?? 0} href="/panel/expedientes" />
         <Stat icon={CalendarClock} label="Vencimientos en 7 días" value={weekDeadlines.count ?? 0} href="/panel/agenda" alert={(weekDeadlines.count ?? 0) > 0} />
         <Stat icon={Gavel} label="Audiencias en 7 días" value={weekHearings.count ?? 0} href="/panel/agenda" />
-        <Stat icon={Users} label="Clientes activos" value={clients.count ?? 0} href="/panel/clientes" />
+        <Stat
+          icon={Wallet}
+          label="Saldo por cobrar"
+          value={formatARS(roundMoney((receivables.data ?? []).reduce((sum, row) => sum + Number(row.balance), 0)))}
+          href="/panel/honorarios"
+        />
       </div>
 
       {overdue.data && overdue.data.length > 0 ? (

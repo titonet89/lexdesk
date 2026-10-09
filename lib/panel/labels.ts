@@ -159,6 +159,12 @@ export const auditTableLabels: Record<string, string> = {
   documents: "Documento",
   profiles: "Usuario",
   non_working_days: "Día inhábil",
+  matter_charges: "Honorario o gasto",
+  charge_payments: "Pago",
+  fee_schedule_items: "Arancel",
+  uma_values: "Valor de la UMA",
+  memberships: "Membresía",
+  organizations: "Estudio",
 };
 
 /** Convierte un objeto de etiquetas en opciones para un <select>. */

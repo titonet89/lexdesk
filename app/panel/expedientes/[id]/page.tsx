@@ -14,6 +14,7 @@ import {
   UserX,
 } from "lucide-react";
 import { ConfirmActionButton } from "@/components/panel/ConfirmActionButton";
+import { FeesSection } from "@/components/panel/fees/FeesSection";
 import { CommentForm } from "@/components/panel/matters/CommentForm";
 import { DocumentDownloadButton } from "@/components/panel/matters/DocumentDownloadButton";
 import { DocumentUploader } from "@/components/panel/matters/DocumentUploader";
@@ -44,7 +45,7 @@ import { deleteDocumentAction, deleteEntryAction, revokeShareAction } from "../a
 
 export const metadata: Metadata = { title: "Expediente" };
 
-type Section = "resumen" | "actuaciones" | "agenda" | "documentos" | "colaboracion";
+type Section = "resumen" | "actuaciones" | "agenda" | "documentos" | "honorarios" | "colaboracion";
 
 export default async function MatterDetailPage({ params, searchParams }: PageProps<"/panel/expedientes/[id]">) {
   const session = await requireMember();
@@ -83,6 +84,7 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
     { id: "actuaciones", label: "Actuaciones", visible: true },
     { id: "agenda", label: "Agenda", visible: isTitular },
     { id: "documentos", label: "Documentos", visible: canSeeDocuments },
+    { id: "honorarios", label: "Honorarios", visible: isTitular },
     { id: "colaboracion", label: isTitular ? "Colaboración" : "Observaciones", visible: true },
   ];
   const visibleSections = sections.filter((section) => section.visible);
@@ -162,6 +164,7 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
       {active === "actuaciones" ? <EntriesSection matterId={id} isTitular={isTitular} /> : null}
       {active === "agenda" && isTitular ? <AgendaSection matterId={id} /> : null}
       {active === "documentos" && canSeeDocuments ? <DocumentsSection matterId={id} isTitular={isTitular} /> : null}
+      {active === "honorarios" && isTitular ? <FeesSection matterId={id} organizationId={matter.organization_id} /> : null}
       {active === "colaboracion" ? (
         <CollaborationSection
           matterId={id}

@@ -19,6 +19,38 @@ export type Database = {
                   Relationships: [
                     
                   ]
+                },"charge_payments": {
+                  Row: {
+                    "amount": number,"charge_id": string,"created_at": string,"created_by": string | null,"id": string,"method": Database["public"]['Enums']["payment_method"],"notes": string | null,"paid_on": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"charge_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"method"?: Database["public"]['Enums']["payment_method"],"notes"?: string | null,"paid_on"?: string
+                  }
+                  Update: {
+                    "amount"?: number,"charge_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"method"?: Database["public"]['Enums']["payment_method"],"notes"?: string | null,"paid_on"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "charge_payments_charge_id_fkey"
+      columns: ["charge_id"]
+isOneToOne: false
+      referencedRelation: "charge_balances"
+      referencedColumns: ["charge_id"]
+    },{
+      foreignKeyName: "charge_payments_charge_id_fkey"
+      columns: ["charge_id"]
+isOneToOne: false
+      referencedRelation: "matter_charges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "charge_payments_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"clients": {
                   Row: {
                     "address": string | null,"archived_at": string | null,"created_at": string,"created_by": string | null,"document_number": string | null,"document_type": Database["public"]['Enums']["document_type"] | null,"email": string | null,"full_name": string,"id": string,"kind": Database["public"]['Enums']["client_kind"],"locality": string | null,"notes": string | null,"organization_id": string,"phone": string | null,"updated_at": string
@@ -100,6 +132,58 @@ isOneToOne: false
       columns: ["organization_id"]
 isOneToOne: false
       referencedRelation: "organizations"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"fee_schedule_items": {
+                  Row: {
+                    "category": string,"created_at": string,"id": string,"is_active": boolean,"legal_reference": string | null,"max_uma": number | null,"min_uma": number,"name": string,"organization_id": string,"sort_order": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "category": string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"legal_reference"?: string | null,"max_uma"?: number | null,"min_uma": number,"name": string,"organization_id": string,"sort_order"?: number,"updated_at"?: string
+                  }
+                  Update: {
+                    "category"?: string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"legal_reference"?: string | null,"max_uma"?: number | null,"min_uma"?: number,"name"?: string,"organization_id"?: string,"sort_order"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "fee_schedule_items_organization_id_fkey"
+      columns: ["organization_id"]
+isOneToOne: false
+      referencedRelation: "organizations"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"matter_charges": {
+                  Row: {
+                    "amount": number,"charged_on": string,"concept": string,"created_at": string,"created_by": string | null,"due_on": string | null,"id": string,"kind": Database["public"]['Enums']["charge_kind"],"matter_id": string,"notes": string | null,"schedule_item_id": string | null,"uma_quantity": number | null,"uma_value": number | null,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"charged_on"?: string,"concept": string,"created_at"?: string,"created_by"?: string | null,"due_on"?: string | null,"id"?: string,"kind": Database["public"]['Enums']["charge_kind"],"matter_id": string,"notes"?: string | null,"schedule_item_id"?: string | null,"uma_quantity"?: number | null,"uma_value"?: number | null,"updated_at"?: string
+                  }
+                  Update: {
+                    "amount"?: number,"charged_on"?: string,"concept"?: string,"created_at"?: string,"created_by"?: string | null,"due_on"?: string | null,"id"?: string,"kind"?: Database["public"]['Enums']["charge_kind"],"matter_id"?: string,"notes"?: string | null,"schedule_item_id"?: string | null,"uma_quantity"?: number | null,"uma_value"?: number | null,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "matter_charges_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "matter_charges_matter_id_fkey"
+      columns: ["matter_id"]
+isOneToOne: false
+      referencedRelation: "matters"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "matter_charges_schedule_item_id_fkey"
+      columns: ["schedule_item_id"]
+isOneToOne: false
+      referencedRelation: "fee_schedule_items"
       referencedColumns: ["id"]
     }
                   ]
@@ -293,18 +377,61 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"uma_values": {
+                  Row: {
+                    "created_at": string,"created_by": string | null,"effective_from": string,"id": string,"note": string | null,"organization_id": string,"value": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"created_by"?: string | null,"effective_from": string,"id"?: string,"note"?: string | null,"organization_id": string,"value": number
+                  }
+                  Update: {
+                    "created_at"?: string,"created_by"?: string | null,"effective_from"?: string,"id"?: string,"note"?: string | null,"organization_id"?: string,"value"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "uma_values_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "uma_values_organization_id_fkey"
+      columns: ["organization_id"]
+isOneToOne: false
+      referencedRelation: "organizations"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
-            [_ in never]: never
+            "charge_balances": {
+                  Row: {
+                    "amount": number | null,"balance": number | null,"charge_id": string | null,"kind": Database["public"]['Enums']["charge_kind"] | null,"matter_id": string | null,"paid": number | null,"status": string | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "matter_charges_matter_id_fkey"
+      columns: ["matter_id"]
+isOneToOne: false
+      referencedRelation: "matters"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
           }
           Functions: {
             "log_access":
 { Args: { "p_action": string,"p_record_id": string,"p_table_name": string }; Returns: undefined
+                           },
+"restore_fee_schedule":
+{ Args: { "p_org": string }; Returns: undefined
                            }
           }
           Enums: {
-            "app_role": "titular"|"colaborador","client_kind": "persona"|"empresa","document_type": "DNI"|"CUIT"|"CUIL"|"Pasaporte"|"Otro","entry_kind": "escrito"|"audiencia"|"notificacion"|"resolucion"|"reunion"|"llamada"|"nota"|"otro","event_kind": "audiencia"|"vencimiento"|"reunion"|"tramite"|"recordatorio"|"escrito"|"cedula","event_priority": "normal"|"alta"|"critica","event_status": "pendiente"|"cumplido"|"cancelado","matter_status": "consulta"|"activo"|"en_espera"|"cerrado"|"archivado","non_working_day_kind": "feriado"|"feria_judicial"|"inhabil","practice_area": "familia"|"sucesiones"|"civil"|"laboral"|"violencia_genero"|"otro","procedural_stage": "iniciacion"|"tramite"|"prueba"|"alegatos"|"sentencia"|"recursos"|"ejecucion"|"archivo","share_permission": "lectura"|"comentario"
+            "app_role": "titular"|"colaborador","charge_kind": "honorario"|"gasto","client_kind": "persona"|"empresa","document_type": "DNI"|"CUIT"|"CUIL"|"Pasaporte"|"Otro","entry_kind": "escrito"|"audiencia"|"notificacion"|"resolucion"|"reunion"|"llamada"|"nota"|"otro","event_kind": "audiencia"|"vencimiento"|"reunion"|"tramite"|"recordatorio"|"escrito"|"cedula","event_priority": "normal"|"alta"|"critica","event_status": "pendiente"|"cumplido"|"cancelado","matter_status": "consulta"|"activo"|"en_espera"|"cerrado"|"archivado","non_working_day_kind": "feriado"|"feria_judicial"|"inhabil","payment_method": "transferencia"|"efectivo"|"tarjeta"|"cheque"|"otro","practice_area": "familia"|"sucesiones"|"civil"|"laboral"|"violencia_genero"|"otro","procedural_stage": "iniciacion"|"tramite"|"prueba"|"alegatos"|"sentencia"|"recursos"|"ejecucion"|"archivo","share_permission": "lectura"|"comentario"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -420,7 +547,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "app_role": ["titular", "colaborador"],"client_kind": ["persona", "empresa"],"document_type": ["DNI", "CUIT", "CUIL", "Pasaporte", "Otro"],"entry_kind": ["escrito", "audiencia", "notificacion", "resolucion", "reunion", "llamada", "nota", "otro"],"event_kind": ["audiencia", "vencimiento", "reunion", "tramite", "recordatorio", "escrito", "cedula"],"event_priority": ["normal", "alta", "critica"],"event_status": ["pendiente", "cumplido", "cancelado"],"matter_status": ["consulta", "activo", "en_espera", "cerrado", "archivado"],"non_working_day_kind": ["feriado", "feria_judicial", "inhabil"],"practice_area": ["familia", "sucesiones", "civil", "laboral", "violencia_genero", "otro"],"procedural_stage": ["iniciacion", "tramite", "prueba", "alegatos", "sentencia", "recursos", "ejecucion", "archivo"],"share_permission": ["lectura", "comentario"]
+            "app_role": ["titular", "colaborador"],"charge_kind": ["honorario", "gasto"],"client_kind": ["persona", "empresa"],"document_type": ["DNI", "CUIT", "CUIL", "Pasaporte", "Otro"],"entry_kind": ["escrito", "audiencia", "notificacion", "resolucion", "reunion", "llamada", "nota", "otro"],"event_kind": ["audiencia", "vencimiento", "reunion", "tramite", "recordatorio", "escrito", "cedula"],"event_priority": ["normal", "alta", "critica"],"event_status": ["pendiente", "cumplido", "cancelado"],"matter_status": ["consulta", "activo", "en_espera", "cerrado", "archivado"],"non_working_day_kind": ["feriado", "feria_judicial", "inhabil"],"payment_method": ["transferencia", "efectivo", "tarjeta", "cheque", "otro"],"practice_area": ["familia", "sucesiones", "civil", "laboral", "violencia_genero", "otro"],"procedural_stage": ["iniciacion", "tramite", "prueba", "alegatos", "sentencia", "recursos", "ejecucion", "archivo"],"share_permission": ["lectura", "comentario"]
           }
         }
 } as const

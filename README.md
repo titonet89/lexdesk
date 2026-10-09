@@ -40,6 +40,7 @@ documentos y colaboración segura entre colegas.
 | **Expedientes** | Carátula, número y año, fuero, juzgado y secretaría, contraparte y su abogado/a, estado y **etapa procesal**, historial de actuaciones y documentos. Filtros por fuero, cliente, área y estado. |
 | **Tablero por etapa** | Vista Kanban (iniciación → archivo) con arrastrar y soltar por mouse, touch o teclado; cada cambio de etapa queda registrado solo en el historial. |
 | **Agenda** | Calendario mensual por tipo de evento (audiencia, vencimiento, escrito, cédula…), **plazos perentorios** resaltados y **cálculo de plazos en días hábiles** (saltea fines de semana, feriados y ferias judiciales). |
+| **Honorarios y gastos** | Cargos por expediente calculados desde el arancel (UMA × valor vigente) o como % del monto del juicio, pagos parciales, saldo y cuentas por cobrar. Arancel editable precargado con la **Ley 6368 de Jujuy** y la UMA publicada por el Colegio. |
 | **Documentos** | Almacenamiento privado, URLs firmadas de 60 s y registro de cada descarga. |
 | **Colaboración** | Compartir un expediente puntual con un colega (lectura o comentarios, con vencimiento opcional). |
 | **Auditoría** | Quién creó, modificó, borró, vio o descargó qué y cuándo. |
@@ -55,6 +56,11 @@ documentos y colaboración segura entre colegas.
 
 <p align="center">
   <img src="docs/screenshots/panel-tablero.png" alt="Tablero Kanban de expedientes por etapa procesal" width="900" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/panel-honorarios.png" alt="Honorarios del expediente calculados desde el arancel" width="49%" />
+  <img src="docs/screenshots/panel-arancel.png" alt="Arancel editable y valor de la UMA" width="49%" />
 </p>
 
 <p align="center">
@@ -119,7 +125,7 @@ Más detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 | Suite | Qué verifica |
 |---|---|
-| `npm run test:db` | **42 pruebas pgTAP** de RLS: aislamiento entre estudios, anónimo, titular sin/con 2FA, colaborador en varios estudios, accesos vencidos y revocados, borrado en cascada. |
+| `npm run test:db` | **53 pruebas pgTAP** de RLS: aislamiento entre estudios, honorarios (no se cobra de más, estados de pago, colaboradores sin acceso), anónimo, titular sin/con 2FA, colaborador en varios estudios, accesos vencidos y revocados, borrado en cascada. |
 | `npx playwright test` | Flujo completo: login, alta obligatoria de 2FA, expedientes, documentos, agenda, invitación de un colega por email, comentarios, revocación y aislamiento entre dos estudios. Sitio público en móvil y escritorio. Cómputo de plazos procesales. |
 
 ## 🚀 Correr el proyecto
@@ -162,7 +168,7 @@ docs/                    arquitectura y estrategia de seguridad
 - [x] Modo oscuro, paleta de comandos (Ctrl+K) y acciones rápidas globales.
 - [x] Vista Kanban de expedientes por etapa procesal.
 - [ ] Vista semanal de agenda.
-- [ ] Honorarios y gastos por expediente.
+- [x] Honorarios y gastos por expediente (Ley 6368 de Jujuy).
 - [ ] Alertas de vencimientos (24 h y 3 días antes) por email.
 - [ ] Vista previa de documentos.
 - [ ] Integraciones: novedades de expedientes (PJN / poderes judiciales provinciales), plantillas `.docx`, recordatorios por WhatsApp.

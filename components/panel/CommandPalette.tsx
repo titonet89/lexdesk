@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   UserPlus,
   Users,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { searchPanelAction, type SearchResults } from "@/lib/panel/search-actions";
@@ -49,6 +50,8 @@ const titularNavigation: PaletteItem[] = [
   { label: "Agenda", href: "/panel/agenda", icon: CalendarDays, keywords: ["calendario"] },
   { label: "Expedientes", href: "/panel/expedientes", icon: FolderOpen },
   { label: "Clientes", href: "/panel/clientes", icon: Users },
+  { label: "Honorarios y cuentas por cobrar", href: "/panel/honorarios", icon: Wallet, keywords: ["cobros", "pagos", "saldo"] },
+  { label: "Arancel y valor de la UMA", href: "/panel/ajustes/honorarios", icon: Settings, keywords: ["ley 6368", "colegio", "honorarios mínimos"] },
   { label: "Colaboradores", href: "/panel/colaboradores", icon: Handshake, keywords: ["colegas"] },
   { label: "Feriados y ferias judiciales", href: "/panel/ajustes/feriados", icon: Settings, keywords: ["inhábiles"] },
   { label: "Auditoría", href: "/panel/ajustes/auditoria", icon: ShieldCheck, keywords: ["registro"] },

@@ -17,6 +17,7 @@ import {
   Search,
   Settings,
   Users,
+  Wallet,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -42,6 +43,7 @@ const titularNav: NavItem[] = [
   { href: "/panel/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/panel/expedientes", label: "Expedientes", icon: FolderOpen },
   { href: "/panel/clientes", label: "Clientes", icon: Users },
+  { href: "/panel/honorarios", label: "Honorarios", icon: Wallet },
   { href: "/panel/colaboradores", label: "Colaboradores", icon: Handshake },
   { href: "/panel/ajustes", label: "Ajustes", icon: Settings },
 ];

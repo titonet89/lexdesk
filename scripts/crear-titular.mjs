@@ -44,13 +44,28 @@ if (!url || !secretKey) {
 
 const supabase = createClient(url, secretKey, { auth: { autoRefreshToken: false, persistSession: false } });
 
+/** Contraseña temporal que cumple la política: mayúsculas, minúsculas y números. */
+const newTemporaryPassword = () => `Tmp-${randomBytes(12).toString("base64url")}9aZ`;
+
 const { data: existing } = await supabase.from("profiles").select("id").eq("email", email).maybeSingle();
 let userId = existing?.id ?? null;
 let temporaryPassword = null;
+let createdNow = false;
 
-if (!userId) {
-  // Contraseña temporal que cumple la política: mayúsculas, minúsculas y números.
-  temporaryPassword = `Tmp-${randomBytes(12).toString("base64url")}9aZ`;
+if (userId) {
+  // Cuenta existente sin ningún estudio (p. ej. un alta anterior que falló a mitad de
+  // camino): nunca recibió su contraseña, así que se le asigna una temporal nueva.
+  const { count } = await supabase.from("memberships").select("user_id", { count: "exact", head: true }).eq("user_id", userId);
+  if (!count) {
+    temporaryPassword = newTemporaryPassword();
+    const { error } = await supabase.auth.admin.updateUserById(userId, { password: temporaryPassword });
+    if (error) {
+      console.error("No se pudo asignar una contraseña temporal:", error.message);
+      process.exit(1);
+    }
+  }
+} else {
+  temporaryPassword = newTemporaryPassword();
   const { data, error } = await supabase.auth.admin.createUser({
     email,
     password: temporaryPassword,
@@ -62,6 +77,15 @@ if (!userId) {
     process.exit(1);
   }
   userId = data.user.id;
+  createdNow = true;
+}
+
+/** Si algo falla después de crear la cuenta, se deshace para no dejar usuarios sin estudio. */
+async function abort(message, organizationId) {
+  console.error(message);
+  if (organizationId) await supabase.from("organizations").delete().eq("id", organizationId);
+  if (createdNow) await supabase.auth.admin.deleteUser(userId);
+  process.exit(1);
 }
 
 const { data: organization, error: orgError } = await supabase
@@ -69,25 +93,21 @@ const { data: organization, error: orgError } = await supabase
   .insert({ name: organizationName })
   .select("id")
   .single();
-if (orgError) {
-  console.error("No se pudo crear el estudio:", orgError.message);
-  process.exit(1);
-}
+if (orgError) await abort(`No se pudo crear el estudio: ${orgError.message}`);
 
 const { error: membershipError } = await supabase
   .from("memberships")
   .insert({ organization_id: organization.id, user_id: userId, role: "titular" });
-if (membershipError) {
-  console.error("No se pudo asignar la titular:", membershipError.message);
-  process.exit(1);
-}
+if (membershipError) await abort(`No se pudo asignar la titular: ${membershipError.message}`, organization.id);
 
-console.log(`\nEstudio "${organizationName}" creado.`);
+console.log("");
+console.log(`Estudio "${organizationName}" creado.`);
 console.log(`  Titular:              ${email}`);
 if (temporaryPassword) {
   console.log(`  Contraseña temporal:  ${temporaryPassword}`);
-  console.log("\nGuardala en un lugar seguro: no se vuelve a mostrar.");
-  console.log("Al ingresar se pedirá activar la verificación en dos pasos.\n");
+  console.log("");
+  console.log("Guardala en un lugar seguro: no se vuelve a mostrar.");
+  console.log("Al ingresar se pedirá activar la verificación en dos pasos.");
 } else {
-  console.log("  (La cuenta ya existía: ingresa con su contraseña actual.)\n");
+  console.log("  (La cuenta ya existía: ingresa con su contraseña actual.)");
 }

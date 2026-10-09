@@ -64,9 +64,28 @@ La seguridad se diseña en capas: si una falla, las otras siguen protegiendo.
 
 ## Checklist antes de producción
 
-- [ ] Proyecto Supabase en la nube creado, con 2FA en la cuenta.
-- [ ] Migraciones aplicadas (`npx supabase db push`).
-- [ ] SMTP propio configurado para los emails de autenticación.
-- [ ] Variables de entorno en Vercel (la service role key solo en el servidor).
-- [ ] Estudio y titular creados con `npm run admin:crear-titular`.
-- [ ] Pruebas E2E en verde contra el entorno de staging.
+- [x] Proyecto Supabase en la nube (São Paulo) con 2FA en la cuenta.
+- [x] Migraciones aplicadas y registradas en el historial del proyecto.
+- [x] Configuración de seguridad aplicada (`supabase config push`): sin registro público,
+      contraseñas de 12+ caracteres, tokens de 15 min, cambio de contraseña con sesión reciente.
+- [x] Verificado como atacante anónimo: registro bloqueado y lectura denegada en todas las tablas.
+- [x] Variables de entorno en Vercel (la clave secreta, marcada como sensible).
+- [ ] SMTP propio (Resend) para invitaciones, recuperación de contraseña y plantillas en español.
+- [ ] Estudio y titular creados con `npm run admin:crear-titular:nube`.
+- [ ] Dominio propio y plan comercial.
+
+### Limitaciones del plan gratuito de Supabase
+
+- Los límites de sesión del servidor (duración máxima e inactividad) requieren el plan Pro.
+  Mitigación: el panel cierra la sesión tras 30 minutos de inactividad desde el navegador.
+- Las plantillas de email solo se pueden modificar con un SMTP propio.
+- El proyecto se pausa tras 7 días sin actividad.
+
+### Aplicar la configuración al proyecto en la nube
+
+```bash
+npx supabase config diff          # revisar diferencias
+npx supabase config push          # confirmar cada cambio
+```
+En el plan gratuito, quitar temporalmente las secciones `[auth.sessions]` y de plantillas
+antes de `config push` (Supabase las rechaza sin plan Pro o SMTP propio).

@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
     "test:db": "supabase test db --db-url postgresql://postgres:postgres@127.0.0.1:54322/postgres",
-    "db:seed-demo": "node --env-file=.env.local scripts/seed-demo.mjs"
+    "db:seed-demo": "node --env-file=.env.local scripts/seed-demo.mjs",
+    "admin:crear-titular:nube": "node --env-file=.env.cloud.local scripts/crear-titular.mjs"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",

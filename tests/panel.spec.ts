@@ -337,8 +337,26 @@ test.describe("gestión del estudio", () => {
     await page.getByRole("button", { name: "Descargar Partida de defunción.pdf" }).click();
     expect((await download).suggestedFilename()).toBe("Partida de defunción.pdf");
 
+    // Vista previa dentro del panel (PDF y texto), sin descargar.
+    await page.getByRole("button", { name: "Ver Partida de defunción.pdf" }).click();
+    const preview = page.getByTestId("document-preview");
+    await expect(preview.getByTestId("preview-pdf")).toHaveAttribute("src", /^blob:/);
+    await preview.getByRole("button", { name: "Cerrar vista previa" }).click();
+    await expect(preview).toHaveCount(0);
+
+    await page.getByTestId("document-input").setInputFiles({
+      name: "Notas de la entrevista.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("Herederos: tres hijos. Inmueble en Humahuaca."),
+    });
+    await expect(page.getByTestId("documents-list")).toContainText("Notas de la entrevista.txt");
+    await page.getByRole("button", { name: "Ver Notas de la entrevista.txt" }).click();
+    await expect(page.getByTestId("preview-text")).toHaveText("Herederos: tres hijos. Inmueble en Humahuaca.");
+    await page.keyboard.press("Escape");
+
     await page.goto("/panel/ajustes/auditoria?tabla=documents");
     await expect(page.getByTestId("audit-table")).toContainText("Descarga");
+    await expect(page.getByTestId("audit-table")).toContainText("Consulta");
   });
 
   test("agenda un vencimiento con la calculadora de días hábiles", async () => {
@@ -367,6 +385,23 @@ test.describe("gestión del estudio", () => {
 
     await page.goto("/panel/agenda?mes=2026-11");
     await expect(page.getByTestId("month-events")).toContainText("Contestar vista");
+
+    // Vista semanal: el vencimiento aparece en su día y se agenda con un clic en un horario libre.
+    // Desde noviembre, el selector "Semana" abre la primera semana de ese mes.
+    await expect(page.getByRole("link", { name: "Semana", exact: true })).toHaveAttribute("href", /vista=semana&semana=2026-11-01/);
+    await page.goto("/panel/agenda?vista=semana&semana=2026-11-23");
+    await expect(page.getByTestId("week-title")).toHaveText("23 al 29 de noviembre de 2026");
+    await expect(page.getByTestId("week-day-2026-11-23")).toContainText("Contestar vista");
+    await page.getByRole("link", { name: "Agendar el 2026-11-24 a las 15 h" }).click();
+    await expect(page.getByLabel("Desde")).toHaveValue("15:00");
+    await page.getByLabel("Título").fill("Reunión con el perito");
+    await page.getByLabel("Tipo").selectOption("reunion");
+    await page.getByRole("button", { name: "Guardar evento" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Reunión con el perito" })).toBeVisible();
+    await page.goto("/panel/agenda?vista=semana&semana=2026-11-23");
+    await expect(page.getByTestId("week-day-2026-11-24").getByTestId("week-event")).toContainText("15:00");
+    await page.getByRole("link", { name: "Semana siguiente" }).click();
+    await expect(page.getByTestId("week-title")).toHaveText("30 de noviembre al 6 de diciembre de 2026");
   });
 
   test("invita a un colega que entra con su propia contraseña y 2FA", async ({ browser }) => {

@@ -169,8 +169,15 @@ export async function registerDocumentAction(
   return { ok: true, message: "Documento subido." };
 }
 
-/** Genera una URL firmada de 60 s para descargar un documento y registra el acceso. */
-export async function getDocumentUrlAction(documentId: string): Promise<{ url: string | null; message?: string }> {
+/**
+ * Genera una URL firmada de 60 s para descargar o previsualizar un documento y
+ * registra el acceso en la auditoría ("download" o "view").
+ */
+export async function getDocumentUrlAction(
+  documentId: string,
+  purpose: "download" | "view" = "download",
+): Promise<{ url: string | null; message?: string }> {
+  if (purpose !== "download" && purpose !== "view") return { url: null, message: "Acción inválida." };
   if (!(await getMemberSession())) return { url: null, message: "No autorizado." };
   if (!uuidSchema.safeParse(documentId).success) return { url: null, message: "Documento inválido." };
 
@@ -188,7 +195,7 @@ export async function getDocumentUrlAction(documentId: string): Promise<{ url: s
     .createSignedUrl(document.storage_path, 60);
   if (error || !data) return { url: null, message: GENERIC_ERROR };
 
-  await supabase.rpc("log_access", { p_table_name: "documents", p_record_id: document.id, p_action: "download" });
+  await supabase.rpc("log_access", { p_table_name: "documents", p_record_id: document.id, p_action: purpose });
   return { url: data.signedUrl };
 }
 

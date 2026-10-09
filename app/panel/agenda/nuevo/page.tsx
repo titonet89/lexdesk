@@ -14,7 +14,8 @@ export const metadata: Metadata = { title: "Nuevo evento" };
 
 export default async function NewEventPage({ searchParams }: PageProps<"/panel/agenda/nuevo">) {
   const { active: organization } = await requireTitular();
-  const { expediente, fecha, tipo } = await searchParams;
+  const { expediente, fecha, tipo, hora } = await searchParams;
+  const startTime = typeof hora === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(hora) ? hora : "09:00";
   const kind = Constants.public.Enums.event_kind.find((value) => value === tipo) ?? "vencimiento";
   const matterId = typeof expediente === "string" && uuidSchema.safeParse(expediente).success ? expediente : "";
   const date = typeof fecha === "string" && /^\d{4}-\d{2}-\d{2}$/.test(fecha) ? fecha : todayIso();
@@ -45,7 +46,7 @@ export default async function NewEventPage({ searchParams }: PageProps<"/panel/a
           priority: "normal",
           date,
           all_day: false,
-          start_time: "09:00",
+          start_time: startTime,
           end_time: "",
           location: "",
           notes: "",

@@ -39,9 +39,9 @@ documentos y colaboración segura entre colegas.
 | **Inicio** | Vencimientos y audiencias de los próximos 14 días, pendientes vencidos resaltados, actividad reciente. |
 | **Expedientes** | Carátula, número y año, fuero, juzgado y secretaría, contraparte y su abogado/a, estado y **etapa procesal**, historial de actuaciones y documentos. Filtros por fuero, cliente, área y estado. |
 | **Tablero por etapa** | Vista Kanban (iniciación → archivo) con arrastrar y soltar por mouse, touch o teclado; cada cambio de etapa queda registrado solo en el historial. |
-| **Agenda** | Calendario mensual por tipo de evento (audiencia, vencimiento, escrito, cédula…), **plazos perentorios** resaltados y **cálculo de plazos en días hábiles** (saltea fines de semana, feriados y ferias judiciales). |
+| **Agenda** | Vistas **mensual y semanal** (grilla horaria con eventos superpuestos lado a lado, hora actual y alta con un clic en un horario libre) por tipo de evento (audiencia, vencimiento, escrito, cédula…), **plazos perentorios** resaltados y **cálculo de plazos en días hábiles** (saltea fines de semana, feriados y ferias judiciales). |
 | **Honorarios y gastos** | Cargos por expediente calculados desde el arancel (UMA × valor vigente) o como % del monto del juicio, pagos parciales, saldo y cuentas por cobrar. Arancel editable precargado con la **Ley 6368 de Jujuy** y la UMA publicada por el Colegio. |
-| **Documentos** | Almacenamiento privado, URLs firmadas de 60 s y registro de cada descarga. |
+| **Documentos** | Almacenamiento privado, **vista previa** de PDF, imágenes y texto dentro del panel, URLs firmadas de 60 s y registro de cada consulta y descarga. |
 | **Colaboración** | Compartir un expediente puntual con un colega (lectura o comentarios, con vencimiento opcional). |
 | **Auditoría** | Quién creó, modificó, borró, vio o descargó qué y cuándo. |
 | **Multi-estudio** | Cada estudio con sus datos aislados; un colega puede colaborar con varios estudios y cambiar entre ellos. |
@@ -66,6 +66,10 @@ documentos y colaboración segura entre colegas.
 <p align="center">
   <img src="docs/screenshots/panel-paleta.png" alt="Paleta de comandos con búsqueda de expedientes y clientes" width="49%" />
   <img src="docs/screenshots/panel-oscuro.png" alt="Panel en modo oscuro" width="49%" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/panel-semana.png" alt="Vista semanal de la agenda" width="900" />
 </p>
 
 <p align="center">
@@ -167,10 +171,10 @@ docs/                    arquitectura y estrategia de seguridad
 - [x] Multi-estudio (SaaS): datos aislados por organización.
 - [x] Modo oscuro, paleta de comandos (Ctrl+K) y acciones rápidas globales.
 - [x] Vista Kanban de expedientes por etapa procesal.
-- [ ] Vista semanal de agenda.
+- [x] Vista semanal de agenda.
 - [x] Honorarios y gastos por expediente (Ley 6368 de Jujuy).
 - [ ] Alertas de vencimientos (24 h y 3 días antes) por email.
-- [ ] Vista previa de documentos.
+- [x] Vista previa de documentos.
 - [ ] Integraciones: novedades de expedientes (PJN / poderes judiciales provinciales), plantillas `.docx`, recordatorios por WhatsApp.
 
 ## 👤 Autor

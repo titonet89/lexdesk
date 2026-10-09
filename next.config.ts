@@ -25,7 +25,8 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob:",
   "font-src 'self'",
   `connect-src 'self' ${supabaseOrigins().join(" ")}`.trim(),
-  "frame-src https://maps.google.com https://www.google.com",
+  // blob: permite mostrar la vista previa de PDFs generada en el propio navegador.
+  "frame-src 'self' blob: https://maps.google.com https://www.google.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

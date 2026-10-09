@@ -16,7 +16,8 @@ import { CalendarDays, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Badge, Card, CardHeader, EmptyState, PageHeader } from "@/components/panel/ui";
 import { buttonClasses } from "@/components/ui/button";
 import { requireTitular } from "@/lib/auth/session";
-import { formatInZone, parseDateOnly, todayIso, toDateOnly, zonedInputToIso } from "@/lib/panel/dates";
+import { WeekView } from "@/components/panel/agenda/WeekView";
+import { formatInZone, nowInZone, parseDateOnly, todayIso, toDateOnly, zonedInputToIso } from "@/lib/panel/dates";
 import { eventKindDot, eventKindLabels, eventKindTones, toOptions } from "@/lib/panel/labels";
 import { Constants } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
@@ -28,6 +29,14 @@ type EventKind = (typeof Constants.public.Enums.event_kind)[number];
 
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
+/** "23 al 29 de noviembre de 2026" · "30 de noviembre al 6 de diciembre de 2026" */
+function weekRangeLabel(start: Date, end: Date): string {
+  const endLabel = format(end, "d 'de' MMMM 'de' yyyy", { locale: es });
+  if (start.getMonth() === end.getMonth()) return `${format(start, "d")} al ${endLabel}`;
+  if (start.getFullYear() === end.getFullYear()) return `${format(start, "d 'de' MMMM", { locale: es })} al ${endLabel}`;
+  return `${format(start, "d 'de' MMMM 'de' yyyy", { locale: es })} al ${endLabel}`;
+}
+
 export default async function AgendaPage({ searchParams }: PageProps<"/panel/agenda">) {
   const { active: organization } = await requireTitular();
   const params = await searchParams;
@@ -38,15 +47,21 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
   const kind = Constants.public.Enums.event_kind.find((value) => value === params.tipo) as EventKind | undefined;
   const showDone = params.cumplidos === "1";
 
-  const gridStart = startOfWeek(startOfMonth(monthDate), { weekStartsOn: 1 });
-  const gridEnd = endOfWeek(endOfMonth(monthDate), { weekStartsOn: 1 });
+  const view = params.vista === "semana" ? "semana" : "mes";
+  const weekView = view === "semana";
+  const weekParam = typeof params.semana === "string" && /^\d{4}-\d{2}-\d{2}$/.test(params.semana) ? params.semana : today;
+  const weekStart = startOfWeek(parseDateOnly(weekParam), { weekStartsOn: 1 });
+  const weekDays = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+
+  const gridStart = view === "semana" ? weekStart : startOfWeek(startOfMonth(monthDate), { weekStartsOn: 1 });
+  const gridEnd = view === "semana" ? weekDays[6] : endOfWeek(endOfMonth(monthDate), { weekStartsOn: 1 });
   const days: Date[] = [];
   for (let day = gridStart; day <= gridEnd; day = addDays(day, 1)) days.push(day);
 
   const supabase = await createClient();
   let request = supabase
     .from("events")
-    .select("id, title, kind, priority, is_peremptory, status, starts_at, all_day, location, matters(title)")
+    .select("id, title, kind, priority, is_peremptory, status, starts_at, ends_at, all_day, location, matters(title)")
     .eq("organization_id", organization.organizationId)
     .gte("starts_at", zonedInputToIso(toDateOnly(gridStart), "00:00"))
     .lte("starts_at", zonedInputToIso(toDateOnly(gridEnd), "23:59"))
@@ -75,7 +90,14 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
 
   const query = (overrides: Record<string, string | undefined>) => {
     const search = new URLSearchParams();
-    const values = { mes: monthParam, tipo: kind, cumplidos: showDone ? "1" : undefined, ...overrides };
+    const values = {
+      vista: view === "semana" ? "semana" : undefined,
+      mes: view === "mes" ? monthParam : undefined,
+      semana: view === "semana" ? toDateOnly(weekStart) : undefined,
+      tipo: kind,
+      cumplidos: showDone ? "1" : undefined,
+      ...overrides,
+    };
     for (const [key, value] of Object.entries(values)) if (value) search.set(key, value);
     return `/panel/agenda?${search.toString()}`;
   };
@@ -86,10 +108,32 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
         title="Agenda"
         description="Audiencias, vencimientos, reuniones y trámites."
         actions={
-          <Link href="/panel/agenda/nuevo" className={buttonClasses("primary", "md")}>
-            <Plus aria-hidden="true" />
-            Nuevo evento
-          </Link>
+          <>
+            <nav aria-label="Vista de la agenda" className="flex rounded-full bg-ink/5 p-1">
+              {(
+                [
+                  { id: "mes", label: "Mes", href: query({ vista: undefined, semana: undefined, mes: format(weekView ? weekStart : monthDate, "yyyy-MM") }) },
+                  { id: "semana", label: "Semana", href: query({ vista: "semana", mes: undefined, semana: weekView ? toDateOnly(weekStart) : monthParam === today.slice(0, 7) ? today : `${monthParam}-01` }) },
+                ] as const
+              ).map((option) => (
+                <Link
+                  key={option.id}
+                  href={option.href}
+                  aria-current={view === option.id ? "page" : undefined}
+                  className={cn(
+                    "inline-flex h-9 items-center rounded-full px-4 text-sm font-medium transition-colors",
+                    view === option.id ? "bg-surface text-ink shadow-sm" : "text-ink-muted hover:text-ink",
+                  )}
+                >
+                  {option.label}
+                </Link>
+              ))}
+            </nav>
+            <Link href="/panel/agenda/nuevo" className={buttonClasses("primary", "md")}>
+              <Plus aria-hidden="true" />
+              Nuevo evento
+            </Link>
+          </>
         }
       />
 
@@ -115,6 +159,36 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
         </Link>
       </div>
 
+      {weekView ? (
+        <>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <Link href={query({ semana: toDateOnly(addDays(weekStart, -7)) })} className="grid size-10 place-items-center rounded-lg hover:bg-ink/5" aria-label="Semana anterior">
+              <ChevronLeft className="size-5" aria-hidden="true" />
+            </Link>
+            <div className="text-center">
+              <h2 className="font-serif text-xl text-ink" data-testid="week-title">
+                {weekRangeLabel(weekStart, weekDays[6])}
+              </h2>
+              {!weekDays.some((day) => toDateOnly(day) === today) ? (
+                <Link href={query({ semana: today })} className="text-xs font-medium text-accent-ink hover:underline">
+                  Ir a esta semana
+                </Link>
+              ) : null}
+            </div>
+            <Link href={query({ semana: toDateOnly(addDays(weekStart, 7)) })} className="grid size-10 place-items-center rounded-lg hover:bg-ink/5" aria-label="Semana siguiente">
+              <ChevronRight className="size-5" aria-hidden="true" />
+            </Link>
+          </div>
+          <WeekView
+            days={weekDays}
+            events={events ?? []}
+            nonWorking={nonWorkingByDay}
+            today={today}
+            nowMinutes={nowInZone().getHours() * 60 + nowInZone().getMinutes()}
+          />
+        </>
+      ) : (
+      <>
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between border-b border-ink/8 px-4 py-3 sm:px-5">
           <Link href={query({ mes: format(subMonths(monthDate, 1), "yyyy-MM") })} className="grid size-10 place-items-center rounded-lg hover:bg-ink/5" aria-label="Mes anterior">
@@ -246,6 +320,8 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
           <EmptyState icon={<CalendarDays aria-hidden="true" />} title="Sin eventos este mes" />
         )}
       </Card>
+      </>
+      )}
     </>
   );
 }

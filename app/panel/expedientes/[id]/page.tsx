@@ -17,6 +17,7 @@ import { ConfirmActionButton } from "@/components/panel/ConfirmActionButton";
 import { FeesSection } from "@/components/panel/fees/FeesSection";
 import { CommentForm } from "@/components/panel/matters/CommentForm";
 import { DocumentDownloadButton } from "@/components/panel/matters/DocumentDownloadButton";
+import { DocumentPreviewButton } from "@/components/panel/matters/DocumentPreviewButton";
 import { DocumentUploader } from "@/components/panel/matters/DocumentUploader";
 import { EntryForm } from "@/components/panel/matters/EntryForm";
 import { ShareForm } from "@/components/panel/matters/ShareForm";
@@ -24,7 +25,7 @@ import { Badge, Card, CardHeader, EmptyState, PageHeader } from "@/components/pa
 import { buttonClasses } from "@/components/ui/button";
 import { isTitularOf, requireMember } from "@/lib/auth/session";
 import { formatDateOnly, formatInZone, relativeDayLabel, todayIso } from "@/lib/panel/dates";
-import { formatBytes } from "@/lib/panel/documents";
+import { formatBytes, previewKind } from "@/lib/panel/documents";
 import {
   entryKindLabels,
   eventKindLabels,
@@ -371,6 +372,9 @@ async function DocumentsSection({ matterId, isTitular }: { matterId: string; isT
                     {formatBytes(document.size_bytes)} · {formatInZone(document.created_at, "d MMM yyyy")}
                   </span>
                 </span>
+                {previewKind(document.mime_type) ? (
+                  <DocumentPreviewButton documentId={document.id} name={document.name} kind={previewKind(document.mime_type)!} />
+                ) : null}
                 <DocumentDownloadButton documentId={document.id} name={document.name} />
                 {isTitular ? (
                   <ConfirmActionButton

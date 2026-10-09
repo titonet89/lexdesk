@@ -57,6 +57,17 @@ export const matterSchema = z
     jurisdiction: requiredText(2, 100, "Jurisdicción"),
     counterpart: optionalText(300),
     status: z.enum(enums.matter_status),
+    stage: z.enum(enums.procedural_stage),
+    file_year: z
+      .string()
+      .trim()
+      .transform((value) => (value === "" ? null : Number(value)))
+      .refine((value) => value === null || (Number.isInteger(value) && value >= 1900 && value <= 2100), {
+        error: "Año inválido.",
+      }),
+    forum: optionalText(100),
+    secretariat: optionalText(100),
+    counterpart_lawyer: optionalText(200),
     opened_on: isoDate,
     closed_on: optionalIsoDate,
     description: optionalText(10000),
@@ -91,6 +102,7 @@ export const eventSchema = z
     end_time: z.string(),
     location: optionalText(200),
     notes: optionalText(5000),
+    is_peremptory: z.boolean(),
     deadline_from: optionalIsoDate,
     deadline_business_days: z
       .string()

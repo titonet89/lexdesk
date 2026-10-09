@@ -33,7 +33,10 @@ import {
   matterStatusTones,
   practiceAreaLabels,
   sharePermissionLabels,
+  stageLabels,
+  stageTones,
 } from "@/lib/panel/labels";
+import { formatFileNumber } from "@/lib/panel/matters";
 import { uuidSchema } from "@/lib/panel/schemas";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
@@ -98,7 +101,7 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
         }
         description={[
           practiceAreaLabels[matter.area],
-          matter.file_number ? `Expte. ${matter.file_number}` : null,
+          formatFileNumber(matter.file_number, matter.file_year),
           matter.court,
         ]
           .filter(Boolean)
@@ -120,6 +123,7 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
       />
 
       <div className="mb-5 flex flex-wrap items-center gap-2">
+        <Badge tone={stageTones[matter.stage]}>Etapa: {stageLabels[matter.stage]}</Badge>
         <Badge tone={matterStatusTones[matter.status]}>{matterStatusLabels[matter.status]}</Badge>
         {matter.is_sensitive ? (
           <Badge tone="gold">
@@ -176,6 +180,12 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
 
 interface MatterWithClient {
   client_id: string;
+  file_number: string | null;
+  file_year: number | null;
+  forum: string | null;
+  court: string | null;
+  secretariat: string | null;
+  counterpart_lawyer: string | null;
   clients: { id: string; full_name: string } | null;
   jurisdiction: string;
   counterpart: string | null;
@@ -194,8 +204,13 @@ function SummarySection({ matter, isTitular }: { matter: MatterWithClient; isTit
         </Link>
       ) : null,
     },
-    { label: "Contraparte", value: matter.counterpart },
+    { label: "Expediente", value: formatFileNumber(matter.file_number, matter.file_year) },
+    { label: "Fuero", value: matter.forum },
+    { label: "Juzgado", value: matter.court },
+    { label: "Secretaría", value: matter.secretariat },
     { label: "Jurisdicción", value: matter.jurisdiction },
+    { label: "Contraparte", value: matter.counterpart },
+    { label: "Abogado/a contrario/a", value: matter.counterpart_lawyer },
     { label: "Inicio", value: formatDateOnly(matter.opened_on) },
     { label: "Cierre", value: matter.closed_on ? formatDateOnly(matter.closed_on) : null },
   ].filter((row) => row.value);

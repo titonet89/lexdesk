@@ -46,7 +46,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
   const supabase = await createClient();
   let request = supabase
     .from("events")
-    .select("id, title, kind, priority, status, starts_at, all_day, location, matters(title)")
+    .select("id, title, kind, priority, is_peremptory, status, starts_at, all_day, location, matters(title)")
     .eq("organization_id", organization.organizationId)
     .gte("starts_at", zonedInputToIso(toDateOnly(gridStart), "00:00"))
     .lte("starts_at", zonedInputToIso(toDateOnly(gridEnd), "23:59"))
@@ -194,7 +194,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
                         className={cn(
                           "flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[11px] leading-tight text-ink hover:bg-ink/5",
                           event.status !== "pendiente" && "text-ink-muted/60 line-through",
-                          event.priority === "critica" && "bg-danger-soft font-semibold",
+                          (event.priority === "critica" || event.is_peremptory) && "bg-danger-soft font-semibold",
                         )}
                         title={event.title}
                       >
@@ -230,6 +230,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
                       </span>
                       <Badge tone={eventKindTones[event.kind]}>{eventKindLabels[event.kind]}</Badge>
                       {event.priority === "critica" ? <Badge tone="red">Crítico</Badge> : null}
+                      {event.is_peremptory ? <Badge tone="red">Perentorio</Badge> : null}
                     </span>
                     <span className="block truncate text-sm text-ink-muted">
                       {event.all_day ? "Todo el día" : `${formatInZone(event.starts_at, "HH:mm")} h`}

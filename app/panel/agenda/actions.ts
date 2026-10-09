@@ -25,6 +25,7 @@ function parseEvent(formData: FormData) {
     end_time: formText(formData, "end_time"),
     location: formText(formData, "location"),
     notes: formText(formData, "notes"),
+    is_peremptory: formData.get("is_peremptory") === "on",
     deadline_from: formText(formData, "deadline_from"),
     deadline_business_days: formText(formData, "deadline_business_days"),
   });
@@ -48,6 +49,7 @@ function toRow(data: NonNullable<ReturnType<typeof parseEvent>["data"]>): Omit<E
     all_day: data.all_day,
     location: data.location,
     notes: data.notes,
+    is_peremptory: data.is_peremptory,
     deadline_from: data.deadline_business_days ? data.deadline_from : null,
     deadline_business_days: data.deadline_from ? data.deadline_business_days : null,
   };

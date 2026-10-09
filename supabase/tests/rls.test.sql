@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(39);
+select plan(42);
 
 -- ---------------------------------------------------------------------------
 -- Datos de prueba (como superusuario): dos estudios, A y B.
@@ -181,6 +181,30 @@ select set_config('request.jwt.claims', '{"sub":"55555555-5555-5555-5555-5555555
 select is((select count(*)::int from public.matters) + (select count(*)::int from public.organizations), 0,
   'Usuario sin estudio: no ve nada');
 reset role;
+
+-- Etapa procesal: el cambio queda registrado en el historial; un colega no puede cambiarla.
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated","aal":"aal2"}', true);
+update public.matters set stage = 'prueba' where id = 'd0000000-0000-0000-0000-0000000000a1';
+select is(
+  (select count(*)::int from public.matter_entries
+    where matter_id = 'd0000000-0000-0000-0000-0000000000a1' and summary = 'Cambio de etapa: Iniciación → Prueba'),
+  1, 'El cambio de etapa se registra solo en el historial');
+select lives_ok(
+  $$insert into public.events (organization_id, title, kind, starts_at, is_peremptory)
+    values ('aaaa0000-0000-0000-0000-00000000000a', 'Cédula a diligenciar', 'cedula', now(), true)$$,
+  'Se pueden agendar cédulas con plazo perentorio');
+reset role;
+
+update public.matter_shares set expires_at = null, permission = 'comentario'
+  where matter_id = 'd0000000-0000-0000-0000-0000000000a1' and revoked_at is null;
+
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated","aal":"aal2"}', true);
+update public.matters set stage = 'sentencia' where id = 'd0000000-0000-0000-0000-0000000000a1';
+reset role;
+select is((select stage::text from public.matters where id = 'd0000000-0000-0000-0000-0000000000a1'), 'prueba',
+  'Un colega no puede cambiar la etapa procesal');
 
 -- Eliminar un estudio borra en cascada todos sus datos (y nada de otros estudios).
 delete from public.organizations where id = 'aaaa0000-0000-0000-0000-00000000000a';

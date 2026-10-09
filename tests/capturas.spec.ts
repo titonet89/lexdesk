@@ -47,6 +47,10 @@ test("capturas del README", async ({ browser }) => {
   await page.goto("/panel/agenda");
   await page.screenshot({ path: `${DIR}/panel-agenda.png` });
 
+  await page.goto("/panel/expedientes?vista=tablero");
+  await page.getByTestId("stage-board").waitFor();
+  await page.screenshot({ path: `${DIR}/panel-tablero.png` });
+
   await page.goto("/panel/expedientes");
   await page.getByRole("link", { name: /Gómez, Carolina/ }).click();
   await page.waitForURL(/expedientes\/[0-9a-f-]+$/);

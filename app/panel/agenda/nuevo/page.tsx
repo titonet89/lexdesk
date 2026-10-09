@@ -49,6 +49,7 @@ export default async function NewEventPage({ searchParams }: PageProps<"/panel/a
           end_time: "",
           location: "",
           notes: "",
+          is_peremptory: false,
           deadline_from: todayIso(),
           deadline_business_days: "",
         }}

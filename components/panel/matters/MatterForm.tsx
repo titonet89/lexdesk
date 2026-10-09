@@ -7,7 +7,7 @@ import { SubmitButton } from "@/components/panel/SubmitButton";
 import { Card, Field, FormMessage, Input, Select, Textarea } from "@/components/panel/ui";
 import { buttonClasses } from "@/components/ui/button";
 import { initialActionState, type ActionState } from "@/lib/actions";
-import { matterStatusLabels, practiceAreaLabels, toOptions } from "@/lib/panel/labels";
+import { forumSuggestions, matterStatusLabels, practiceAreaLabels, stageLabels, toOptions } from "@/lib/panel/labels";
 import type { Database } from "@/lib/supabase/database.types";
 
 type MatterRow = Database["public"]["Tables"]["matters"]["Row"];
@@ -69,7 +69,7 @@ export function MatterForm({ action, clients, matter, defaultClientId, today, ca
               ))}
             </Select>
           </Field>
-          <Field label="Estado" htmlFor="status" error={errors.status} required>
+          <Field label="Estado" htmlFor="status" error={errors.status} required hint="Situación administrativa.">
             <Select id="status" name="status" defaultValue={matter?.status ?? "consulta"}>
               {toOptions(matterStatusLabels).map((option) => (
                 <option key={option.value} value={option.value}>
@@ -78,33 +78,69 @@ export function MatterForm({ action, clients, matter, defaultClientId, today, ca
               ))}
             </Select>
           </Field>
-          <Field label="N.º de expediente" htmlFor="file_number" error={errors.file_number}>
-            <Input
-              id="file_number"
-              name="file_number"
-              defaultValue={matter?.file_number ?? ""}
-              aria-invalid={invalid("file_number")}
-            />
+          <Field label="Etapa procesal" htmlFor="stage" error={errors.stage} required>
+            <Select id="stage" name="stage" defaultValue={matter?.stage ?? "iniciacion"}>
+              {toOptions(stageLabels).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </Field>
         </div>
+
+        <fieldset className="space-y-5 rounded-2xl border border-ink/8 p-4 sm:p-5">
+          <legend className="px-1 text-sm font-semibold text-ink">Datos del expediente judicial</legend>
+          <div className="grid gap-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,2fr)]">
+            <Field label="N.º de expediente" htmlFor="file_number" error={errors.file_number}>
+              <Input id="file_number" name="file_number" defaultValue={matter?.file_number ?? ""} aria-invalid={invalid("file_number")} />
+            </Field>
+            <Field label="Año" htmlFor="file_year" error={errors.file_year}>
+              <Input
+                id="file_year"
+                name="file_year"
+                inputMode="numeric"
+                maxLength={4}
+                placeholder={today.slice(0, 4)}
+                defaultValue={matter?.file_year ?? ""}
+                aria-invalid={invalid("file_year")}
+              />
+            </Field>
+            <Field label="Fuero" htmlFor="forum" error={errors.forum}>
+              <Input id="forum" name="forum" list="forum-suggestions" defaultValue={matter?.forum ?? ""} aria-invalid={invalid("forum")} />
+              <datalist id="forum-suggestions">
+                {forumSuggestions.map((forum) => (
+                  <option key={forum} value={forum} />
+                ))}
+              </datalist>
+            </Field>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-3">
+            <Field label="Juzgado / organismo" htmlFor="court" error={errors.court}>
+              <Input id="court" name="court" defaultValue={matter?.court ?? ""} placeholder="Ej.: Juzgado Civil N.º 3" aria-invalid={invalid("court")} />
+            </Field>
+            <Field label="Secretaría" htmlFor="secretariat" error={errors.secretariat}>
+              <Input id="secretariat" name="secretariat" defaultValue={matter?.secretariat ?? ""} placeholder="Ej.: Sec. N.º 5" aria-invalid={invalid("secretariat")} />
+            </Field>
+            <Field label="Jurisdicción" htmlFor="jurisdiction" error={errors.jurisdiction} required>
+              <Input id="jurisdiction" name="jurisdiction" defaultValue={matter?.jurisdiction ?? "Jujuy"} aria-invalid={invalid("jurisdiction")} />
+            </Field>
+          </div>
+        </fieldset>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Juzgado / organismo" htmlFor="court" error={errors.court}>
-            <Input id="court" name="court" defaultValue={matter?.court ?? ""} aria-invalid={invalid("court")} />
+          <Field label="Contraparte" htmlFor="counterpart" error={errors.counterpart}>
+            <Input id="counterpart" name="counterpart" defaultValue={matter?.counterpart ?? ""} aria-invalid={invalid("counterpart")} />
           </Field>
-          <Field label="Jurisdicción" htmlFor="jurisdiction" error={errors.jurisdiction} required>
+          <Field label="Abogado/a de la contraparte" htmlFor="counterpart_lawyer" error={errors.counterpart_lawyer}>
             <Input
-              id="jurisdiction"
-              name="jurisdiction"
-              defaultValue={matter?.jurisdiction ?? "Jujuy"}
-              aria-invalid={invalid("jurisdiction")}
+              id="counterpart_lawyer"
+              name="counterpart_lawyer"
+              defaultValue={matter?.counterpart_lawyer ?? ""}
+              aria-invalid={invalid("counterpart_lawyer")}
             />
           </Field>
         </div>
-
-        <Field label="Contraparte" htmlFor="counterpart" error={errors.counterpart}>
-          <Input id="counterpart" name="counterpart" defaultValue={matter?.counterpart ?? ""} aria-invalid={invalid("counterpart")} />
-        </Field>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <Field label="Fecha de inicio" htmlFor="opened_on" error={errors.opened_on} required>

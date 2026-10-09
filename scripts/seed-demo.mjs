@@ -66,11 +66,11 @@ const [gomez, quispe, vargas, ruiz, mamani] = await insert("clients", [
 ]);
 
 const [m1, m2, m3, m4, m5] = await insert("matters", [
-  { client_id: gomez, title: "Gómez, Carolina c/ Ríos, Martín s/ alimentos", area: "familia", status: "activo", file_number: "F-1024/2026", court: "Juzgado de Familia N.º 2", counterpart: "Martín Ríos", opened_on: dateOnly(-60), created_by: owner, organization_id: org },
-  { client_id: quispe, title: "Quispe, Néstor s/ sucesión ab intestato", area: "sucesiones", status: "activo", file_number: "S-588/2026", court: "Juzgado Civil y Comercial N.º 1", opened_on: dateOnly(-40), created_by: owner, organization_id: org },
-  { client_id: vargas, title: "Vargas, Andrea c/ Transportes Andinos S.A. s/ despido", area: "laboral", status: "activo", file_number: "L-2210/2026", court: "Tribunal del Trabajo, Sala II", counterpart: "Transportes Andinos S.A.", opened_on: dateOnly(-25), created_by: owner, organization_id: org },
-  { client_id: ruiz, title: "Distribuidora del Norte S.R.L. c/ Comercial Sur s/ cobro de pesos", area: "civil", status: "en_espera", file_number: "C-731/2026", court: "Juzgado Civil y Comercial N.º 4", counterpart: "Comercial Sur S.A.", opened_on: dateOnly(-90), created_by: owner, organization_id: org },
-  { client_id: mamani, title: "Mamani, Rosa s/ medidas de protección", area: "violencia_genero", status: "activo", is_sensitive: true, court: "Juzgado de Violencia Familiar N.º 1", opened_on: dateOnly(-10), created_by: owner, organization_id: org },
+  { client_id: gomez, title: "Gómez, Carolina c/ Ríos, Martín s/ alimentos", area: "familia", status: "activo", stage: "prueba", file_number: "F-1024/2026", forum: "Familia", court: "Juzgado de Familia N.º 2", secretariat: "Sec. N.º 3", counterpart: "Martín Ríos", counterpart_lawyer: "Dr. Pablo Sosa", opened_on: dateOnly(-60), created_by: owner, organization_id: org },
+  { client_id: quispe, title: "Quispe, Néstor s/ sucesión ab intestato", area: "sucesiones", status: "activo", stage: "sentencia", file_number: "S-588/2026", forum: "Civil y Comercial", court: "Juzgado Civil y Comercial N.º 1", secretariat: "Sec. N.º 2", opened_on: dateOnly(-40), created_by: owner, organization_id: org },
+  { client_id: vargas, title: "Vargas, Andrea c/ Transportes Andinos S.A. s/ despido", area: "laboral", status: "activo", stage: "tramite", file_number: "L-2210/2026", forum: "Laboral", court: "Tribunal del Trabajo, Sala II", counterpart: "Transportes Andinos S.A.", counterpart_lawyer: "Dra. Inés Paredes", opened_on: dateOnly(-25), created_by: owner, organization_id: org },
+  { client_id: ruiz, title: "Distribuidora del Norte S.R.L. c/ Comercial Sur s/ cobro de pesos", area: "civil", status: "en_espera", stage: "recursos", file_number: "C-731/2026", forum: "Civil y Comercial", court: "Juzgado Civil y Comercial N.º 4", secretariat: "Sec. N.º 8", counterpart: "Comercial Sur S.A.", opened_on: dateOnly(-90), created_by: owner, organization_id: org },
+  { client_id: mamani, title: "Mamani, Rosa s/ medidas de protección", area: "violencia_genero", status: "activo", stage: "iniciacion", is_sensitive: true, forum: "Violencia Familiar y de Género", court: "Juzgado de Violencia Familiar N.º 1", opened_on: dateOnly(-10), created_by: owner, organization_id: org },
 ]);
 
 await insert("matter_entries", [
@@ -85,13 +85,15 @@ await insert("matter_entries", [
 ]);
 
 await insert("events", [
-  { matter_id: m3, title: "Ofrecer prueba", kind: "vencimiento", priority: "critica", starts_at: at(2, 9), deadline_from: dateOnly(-3), deadline_business_days: 5, created_by: owner, organization_id: org },
+  { matter_id: m3, title: "Ofrecer prueba", kind: "vencimiento", priority: "critica", is_peremptory: true, starts_at: at(2, 9), deadline_from: dateOnly(-3), deadline_business_days: 5, created_by: owner, organization_id: org },
   { matter_id: m1, title: "Audiencia de alimentos", kind: "audiencia", priority: "alta", starts_at: at(3, 10, 30), ends_at: at(3, 11, 30), location: "Juzgado de Familia N.º 2", created_by: owner, organization_id: org },
   { matter_id: m2, title: "Inscribir declaratoria en el Registro", kind: "tramite", starts_at: at(5, 11), created_by: owner, organization_id: org },
   { title: "Primera consulta: reclamo de alquiler", kind: "reunion", starts_at: at(1, 17), ends_at: at(1, 18), location: "Videollamada", created_by: owner, organization_id: org },
   { matter_id: m4, title: "Contestar traslado de excepciones", kind: "vencimiento", priority: "alta", starts_at: at(8, 9), created_by: owner, organization_id: org },
   { matter_id: m5, title: "Control de medidas de protección", kind: "audiencia", priority: "critica", starts_at: at(10, 9, 30), created_by: owner, organization_id: org },
   { matter_id: m1, title: "Presentar liquidación de cuota", kind: "vencimiento", starts_at: at(-1, 9), created_by: owner, organization_id: org },
+  { matter_id: m4, title: "Presentar memorial de agravios", kind: "escrito", priority: "alta", is_peremptory: true, starts_at: at(4, 9), created_by: owner, organization_id: org },
+  { matter_id: m1, title: "Diligenciar cédula al demandado", kind: "cedula", starts_at: at(6, 10), created_by: owner, organization_id: org },
   { title: "Renovar matrícula profesional", kind: "recordatorio", starts_at: at(20, 9), all_day: true, created_by: owner, organization_id: org },
 ]);
 

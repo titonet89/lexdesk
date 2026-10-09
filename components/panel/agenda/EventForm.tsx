@@ -24,6 +24,7 @@ export interface EventFormDefaults {
   end_time: string;
   location: string;
   notes: string;
+  is_peremptory: boolean;
   deadline_from: string;
   deadline_business_days: string;
 }
@@ -186,6 +187,14 @@ export function EventForm({ action, defaults, matters, nonWorkingDays, cancelHre
             <Input id="end_time" name="end_time" type="time" defaultValue={defaults.end_time} disabled={allDay} />
           </Field>
         </div>
+
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-ink/10 bg-canvas p-4">
+          <input type="checkbox" name="is_peremptory" defaultChecked={defaults.is_peremptory} className="mt-0.5 size-5 shrink-0 accent-gold-600" />
+          <span className="text-sm text-ink-soft">
+            <span className="block font-semibold text-ink">Plazo perentorio</span>
+            Vencido, se pierde el derecho sin necesidad de intimación. Se resalta en la agenda y en el inicio.
+          </span>
+        </label>
 
         <Field label="Lugar" htmlFor="location" error={errors.location}>
           <Input id="location" name="location" defaultValue={defaults.location} placeholder="Ej.: Juzgado de Familia N.º 2, San Salvador de Jujuy" />

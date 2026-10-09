@@ -151,16 +151,59 @@ test.describe("gestión del estudio", () => {
     await page.getByLabel("Área").selectOption("sucesiones");
     await page.getByLabel("Estado").selectOption("activo");
     await page.getByLabel("N.º de expediente").fill(`S-${RUN}`);
+    await page.getByLabel("Año").fill("2026");
+    await page.getByLabel("Fuero").fill("Civil y Comercial");
     await page.getByLabel("Juzgado / organismo").fill("Juzgado Civil y Comercial N.º 1");
+    await page.getByLabel("Secretaría").fill("Sec. N.º 2");
+    await page.getByLabel("Abogado/a de la contraparte").fill("Dr. Contrario");
     await page.getByRole("button", { name: "Guardar expediente" }).click();
 
     await expect(page.getByRole("heading", { level: 1, name: MATTER })).toBeVisible();
     matterUrl = new URL(page.url()).pathname;
+    await expect(page.getByText("Etapa: Iniciación")).toBeVisible();
+    await expect(page.getByText(`Expte. N.º S-${RUN}/2026`).first()).toBeVisible();
+    await expect(page.getByText("Sec. N.º 2")).toBeVisible();
+    await expect(page.getByText("Dr. Contrario")).toBeVisible();
 
     await page.getByRole("link", { name: "Actuaciones" }).click();
     await page.getByLabel("Resumen").fill("Se inició la sucesión");
     await page.getByRole("button", { name: "Registrar actuación" }).click();
     await expect(page.getByTestId("entries-list")).toContainText("Se inició la sucesión");
+  });
+
+  test("el tablero mueve expedientes de etapa y lo registra en el historial", async () => {
+    const page = titularPage;
+    await page.goto(`/panel/expedientes?vista=tablero&q=${RUN}`);
+    const card = page.getByTestId("board-card").filter({ hasText: MATTER });
+    await expect(page.getByTestId("board-column-iniciacion")).toContainText(MATTER);
+
+    // 1) Con el menú "Mover a…" (alternativa accesible al arrastre).
+    await card.getByTestId("board-move").selectOption("prueba");
+    await expect(page.getByTestId("board-column-prueba")).toContainText(MATTER);
+    // Se espera a que termine la actualización del servidor antes de arrastrar.
+    await page.reload();
+    await expect(page.getByTestId("board-column-prueba")).toContainText(MATTER);
+
+    // 2) Arrastrando con el mouse hasta la columna "Sentencia".
+    const handle = card.getByRole("button", { name: `Arrastrar ${MATTER}` });
+    const target = page.getByTestId("board-column-sentencia");
+    // Columna de origen al inicio del tablero: origen y destino quedan visibles a la vez.
+    await page.getByTestId("board-column-prueba").evaluate((column) => column.scrollIntoView({ inline: "start", block: "nearest" }));
+    const from = (await handle.boundingBox())!;
+    const to = (await target.boundingBox())!;
+    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(from.x + 20, from.y + 10, { steps: 5 });
+    await page.mouse.move(to.x + to.width / 2, to.y + 80, { steps: 15 });
+    await page.mouse.up();
+    await expect(page.getByTestId("board-column-sentencia")).toContainText(MATTER);
+
+    // Persistencia y registro automático en el historial.
+    await page.reload();
+    await expect(page.getByTestId("board-column-sentencia")).toContainText(MATTER);
+    await page.goto(`${matterUrl}?seccion=actuaciones`);
+    await expect(page.getByTestId("entries-list")).toContainText("Cambio de etapa: Iniciación → Prueba");
+    await expect(page.getByTestId("entries-list")).toContainText("Cambio de etapa: Prueba → Sentencia");
   });
 
   test("la paleta de comandos busca y navega con el teclado", async () => {

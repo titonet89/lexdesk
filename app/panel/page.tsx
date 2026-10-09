@@ -120,7 +120,7 @@ export default async function PanelHomePage() {
       .lte("starts_at", in7Days),
     supabase
       .from("events")
-      .select("id, title, kind, priority, starts_at, all_day, matters(id, title)")
+      .select("id, title, kind, priority, is_peremptory, starts_at, all_day, matters(id, title)")
       .eq("organization_id", organization.organizationId)
       .eq("status", "pendiente")
       .gte("starts_at", now.toISOString())
@@ -218,6 +218,7 @@ export default async function PanelHomePage() {
                         <span className="truncate font-medium text-ink">{event.title}</span>
                         <Badge tone={eventKindTones[event.kind]}>{eventKindLabels[event.kind]}</Badge>
                         {event.priority === "critica" ? <Badge tone="red">Crítico</Badge> : null}
+                        {event.is_peremptory ? <Badge tone="red">Perentorio</Badge> : null}
                       </span>
                       <span className="block truncate text-sm text-ink-muted">
                         {relativeDayLabel(event.starts_at)}

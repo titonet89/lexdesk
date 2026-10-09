@@ -52,6 +52,7 @@ export default async function EventDetailPage({ params }: PageProps<"/panel/agen
         <Badge tone={event.status === "cumplido" ? "green" : event.status === "cancelado" ? "neutral" : "blue"}>
           {eventStatusLabels[event.status]}
         </Badge>
+        {event.is_peremptory ? <Badge tone="red">Plazo perentorio</Badge> : null}
         {overdue ? <Badge tone="red">Fecha vencida</Badge> : null}
       </div>
 

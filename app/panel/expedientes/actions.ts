@@ -15,6 +15,7 @@ import { getMemberSession, getTitularOrNull } from "@/lib/auth/session";
 import { ALLOWED_DOCUMENT_TYPES, MAX_DOCUMENT_BYTES } from "@/lib/panel/documents";
 import { zonedInputToIso } from "@/lib/panel/dates";
 import { commentSchema, entrySchema, matterSchema, shareSchema, uuidSchema } from "@/lib/panel/schemas";
+import { Constants } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
 
 function matterPath(id: string) {
@@ -31,6 +32,11 @@ function parseMatter(formData: FormData) {
     jurisdiction: formText(formData, "jurisdiction"),
     counterpart: formText(formData, "counterpart"),
     status: formText(formData, "status"),
+    stage: formText(formData, "stage"),
+    file_year: formText(formData, "file_year"),
+    forum: formText(formData, "forum"),
+    secretariat: formText(formData, "secretariat"),
+    counterpart_lawyer: formText(formData, "counterpart_lawyer"),
     opened_on: formText(formData, "opened_on"),
     closed_on: formText(formData, "closed_on"),
     description: formText(formData, "description"),
@@ -264,4 +270,31 @@ export async function addCommentAction(_prev: ActionState, formData: FormData): 
 
   revalidatePath(matterPath(parsed.data.matter_id));
   return actionSuccess("Comentario publicado.");
+}
+
+// ---------------------------------------------------------------------------
+// Tablero por etapa procesal
+// ---------------------------------------------------------------------------
+
+const stageSchema = z.enum(Constants.public.Enums.procedural_stage);
+
+/** Mueve un expediente de etapa (el historial lo registra un trigger en la base). */
+export async function moveMatterStageAction(matterId: string, stage: string): Promise<{ ok: boolean }> {
+  const session = await getTitularOrNull();
+  if (!session) return { ok: false };
+  const parsedStage = stageSchema.safeParse(stage);
+  if (!uuidSchema.safeParse(matterId).success || !parsedStage.success) return { ok: false };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("matters")
+    .update({ stage: parsedStage.data })
+    .eq("id", matterId)
+    .eq("organization_id", session.active.organizationId)
+    .select("id");
+  if (error || !data?.length) return { ok: false };
+
+  revalidatePath("/panel/expedientes");
+  revalidatePath(matterPath(matterId));
+  return { ok: true };
 }

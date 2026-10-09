@@ -61,6 +61,7 @@ export default async function EditEventPage({ params }: PageProps<"/panel/agenda
           end_time: end && !event.all_day ? end.time : "",
           location: event.location ?? "",
           notes: event.notes ?? "",
+          is_peremptory: event.is_peremptory,
           deadline_from: event.deadline_from ?? "",
           deadline_business_days: event.deadline_business_days ? String(event.deadline_business_days) : "",
         }}

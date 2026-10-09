@@ -44,6 +44,8 @@ export const eventKindLabels: Record<Enums["event_kind"], string> = {
   vencimiento: "Vencimiento",
   reunion: "Reunión",
   tramite: "Trámite",
+  escrito: "Escrito",
+  cedula: "Cédula",
   recordatorio: "Recordatorio",
 };
 
@@ -52,6 +54,8 @@ export const eventKindTones: Record<Enums["event_kind"], BadgeTone> = {
   vencimiento: "red",
   reunion: "gold",
   tramite: "neutral",
+  escrito: "blue",
+  cedula: "neutral",
   recordatorio: "amber",
 };
 
@@ -61,8 +65,45 @@ export const eventKindDot: Record<Enums["event_kind"], string> = {
   vencimiento: "bg-red-500",
   reunion: "bg-gold-600",
   tramite: "bg-slate-500",
+  escrito: "bg-indigo-500",
+  cedula: "bg-teal-500",
   recordatorio: "bg-amber-500",
 };
+
+/** Etapas procesales en el orden del tablero. */
+export const stageLabels: Record<Enums["procedural_stage"], string> = {
+  iniciacion: "Iniciación",
+  tramite: "Trámite",
+  prueba: "Prueba",
+  alegatos: "Alegatos",
+  sentencia: "Sentencia",
+  recursos: "Recursos",
+  ejecucion: "Ejecución",
+  archivo: "Archivo",
+};
+
+export const stageTones: Record<Enums["procedural_stage"], BadgeTone> = {
+  iniciacion: "blue",
+  tramite: "neutral",
+  prueba: "amber",
+  alegatos: "amber",
+  sentencia: "gold",
+  recursos: "red",
+  ejecucion: "green",
+  archivo: "neutral",
+};
+
+/** Fueros habituales (sugerencias; el campo admite cualquier texto). */
+export const forumSuggestions = [
+  "Civil y Comercial",
+  "Familia",
+  "Laboral",
+  "Penal",
+  "Violencia Familiar y de Género",
+  "Contencioso Administrativo",
+  "Sucesiones",
+  "Paz",
+] as const;
 
 export const eventPriorityLabels: Record<Enums["event_priority"], string> = {
   normal: "Normal",

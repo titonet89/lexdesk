@@ -17,13 +17,7 @@ export type Database = {
                     "action"?: string,"actor_id"?: string | null,"changed_columns"?: (string)[] | null,"id"?: never,"occurred_at"?: string,"organization_id"?: string | null,"record_id"?: string | null,"table_name"?: string
                   }
                   Relationships: [
-                    {
-      foreignKeyName: "audit_log_organization_id_fkey"
-      columns: ["organization_id"]
-isOneToOne: false
-      referencedRelation: "organizations"
-      referencedColumns: ["id"]
-    }
+                    
                   ]
                 },"clients": {
                   Row: {
@@ -79,14 +73,14 @@ isOneToOne: false
                   ]
                 },"events": {
                   Row: {
-                    "all_day": boolean,"completed_at": string | null,"created_at": string,"created_by": string | null,"deadline_business_days": number | null,"deadline_from": string | null,"ends_at": string | null,"id": string,"kind": Database["public"]['Enums']["event_kind"],"location": string | null,"matter_id": string | null,"notes": string | null,"organization_id": string,"priority": Database["public"]['Enums']["event_priority"],"starts_at": string,"status": Database["public"]['Enums']["event_status"],"title": string,"updated_at": string
+                    "all_day": boolean,"completed_at": string | null,"created_at": string,"created_by": string | null,"deadline_business_days": number | null,"deadline_from": string | null,"ends_at": string | null,"id": string,"is_peremptory": boolean,"kind": Database["public"]['Enums']["event_kind"],"location": string | null,"matter_id": string | null,"notes": string | null,"organization_id": string,"priority": Database["public"]['Enums']["event_priority"],"starts_at": string,"status": Database["public"]['Enums']["event_status"],"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "all_day"?: boolean,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"deadline_business_days"?: number | null,"deadline_from"?: string | null,"ends_at"?: string | null,"id"?: string,"kind"?: Database["public"]['Enums']["event_kind"],"location"?: string | null,"matter_id"?: string | null,"notes"?: string | null,"organization_id": string,"priority"?: Database["public"]['Enums']["event_priority"],"starts_at": string,"status"?: Database["public"]['Enums']["event_status"],"title": string,"updated_at"?: string
+                    "all_day"?: boolean,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"deadline_business_days"?: number | null,"deadline_from"?: string | null,"ends_at"?: string | null,"id"?: string,"is_peremptory"?: boolean,"kind"?: Database["public"]['Enums']["event_kind"],"location"?: string | null,"matter_id"?: string | null,"notes"?: string | null,"organization_id": string,"priority"?: Database["public"]['Enums']["event_priority"],"starts_at": string,"status"?: Database["public"]['Enums']["event_status"],"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "all_day"?: boolean,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"deadline_business_days"?: number | null,"deadline_from"?: string | null,"ends_at"?: string | null,"id"?: string,"kind"?: Database["public"]['Enums']["event_kind"],"location"?: string | null,"matter_id"?: string | null,"notes"?: string | null,"organization_id"?: string,"priority"?: Database["public"]['Enums']["event_priority"],"starts_at"?: string,"status"?: Database["public"]['Enums']["event_status"],"title"?: string,"updated_at"?: string
+                    "all_day"?: boolean,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"deadline_business_days"?: number | null,"deadline_from"?: string | null,"ends_at"?: string | null,"id"?: string,"is_peremptory"?: boolean,"kind"?: Database["public"]['Enums']["event_kind"],"location"?: string | null,"matter_id"?: string | null,"notes"?: string | null,"organization_id"?: string,"priority"?: Database["public"]['Enums']["event_priority"],"starts_at"?: string,"status"?: Database["public"]['Enums']["event_status"],"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -195,14 +189,14 @@ isOneToOne: false
                   ]
                 },"matters": {
                   Row: {
-                    "area": Database["public"]['Enums']["practice_area"],"client_id": string,"closed_on": string | null,"counterpart": string | null,"court": string | null,"created_at": string,"created_by": string | null,"description": string | null,"file_number": string | null,"id": string,"is_sensitive": boolean,"jurisdiction": string,"opened_on": string,"organization_id": string,"status": Database["public"]['Enums']["matter_status"],"title": string,"updated_at": string
+                    "area": Database["public"]['Enums']["practice_area"],"client_id": string,"closed_on": string | null,"counterpart": string | null,"counterpart_lawyer": string | null,"court": string | null,"created_at": string,"created_by": string | null,"description": string | null,"file_number": string | null,"file_year": number | null,"forum": string | null,"id": string,"is_sensitive": boolean,"jurisdiction": string,"opened_on": string,"organization_id": string,"secretariat": string | null,"stage": Database["public"]['Enums']["procedural_stage"],"stage_changed_at": string,"status": Database["public"]['Enums']["matter_status"],"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "area": Database["public"]['Enums']["practice_area"],"client_id": string,"closed_on"?: string | null,"counterpart"?: string | null,"court"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"file_number"?: string | null,"id"?: string,"is_sensitive"?: boolean,"jurisdiction"?: string,"opened_on"?: string,"organization_id": string,"status"?: Database["public"]['Enums']["matter_status"],"title": string,"updated_at"?: string
+                    "area": Database["public"]['Enums']["practice_area"],"client_id": string,"closed_on"?: string | null,"counterpart"?: string | null,"counterpart_lawyer"?: string | null,"court"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"file_number"?: string | null,"file_year"?: number | null,"forum"?: string | null,"id"?: string,"is_sensitive"?: boolean,"jurisdiction"?: string,"opened_on"?: string,"organization_id": string,"secretariat"?: string | null,"stage"?: Database["public"]['Enums']["procedural_stage"],"stage_changed_at"?: string,"status"?: Database["public"]['Enums']["matter_status"],"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "area"?: Database["public"]['Enums']["practice_area"],"client_id"?: string,"closed_on"?: string | null,"counterpart"?: string | null,"court"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"file_number"?: string | null,"id"?: string,"is_sensitive"?: boolean,"jurisdiction"?: string,"opened_on"?: string,"organization_id"?: string,"status"?: Database["public"]['Enums']["matter_status"],"title"?: string,"updated_at"?: string
+                    "area"?: Database["public"]['Enums']["practice_area"],"client_id"?: string,"closed_on"?: string | null,"counterpart"?: string | null,"counterpart_lawyer"?: string | null,"court"?: string | null,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"file_number"?: string | null,"file_year"?: number | null,"forum"?: string | null,"id"?: string,"is_sensitive"?: boolean,"jurisdiction"?: string,"opened_on"?: string,"organization_id"?: string,"secretariat"?: string | null,"stage"?: Database["public"]['Enums']["procedural_stage"],"stage_changed_at"?: string,"status"?: Database["public"]['Enums']["matter_status"],"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -310,7 +304,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "app_role": "titular"|"colaborador","client_kind": "persona"|"empresa","document_type": "DNI"|"CUIT"|"CUIL"|"Pasaporte"|"Otro","entry_kind": "escrito"|"audiencia"|"notificacion"|"resolucion"|"reunion"|"llamada"|"nota"|"otro","event_kind": "audiencia"|"vencimiento"|"reunion"|"tramite"|"recordatorio","event_priority": "normal"|"alta"|"critica","event_status": "pendiente"|"cumplido"|"cancelado","matter_status": "consulta"|"activo"|"en_espera"|"cerrado"|"archivado","non_working_day_kind": "feriado"|"feria_judicial"|"inhabil","practice_area": "familia"|"sucesiones"|"civil"|"laboral"|"violencia_genero"|"otro","share_permission": "lectura"|"comentario"
+            "app_role": "titular"|"colaborador","client_kind": "persona"|"empresa","document_type": "DNI"|"CUIT"|"CUIL"|"Pasaporte"|"Otro","entry_kind": "escrito"|"audiencia"|"notificacion"|"resolucion"|"reunion"|"llamada"|"nota"|"otro","event_kind": "audiencia"|"vencimiento"|"reunion"|"tramite"|"recordatorio"|"escrito"|"cedula","event_priority": "normal"|"alta"|"critica","event_status": "pendiente"|"cumplido"|"cancelado","matter_status": "consulta"|"activo"|"en_espera"|"cerrado"|"archivado","non_working_day_kind": "feriado"|"feria_judicial"|"inhabil","practice_area": "familia"|"sucesiones"|"civil"|"laboral"|"violencia_genero"|"otro","procedural_stage": "iniciacion"|"tramite"|"prueba"|"alegatos"|"sentencia"|"recursos"|"ejecucion"|"archivo","share_permission": "lectura"|"comentario"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -426,7 +420,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "app_role": ["titular", "colaborador"],"client_kind": ["persona", "empresa"],"document_type": ["DNI", "CUIT", "CUIL", "Pasaporte", "Otro"],"entry_kind": ["escrito", "audiencia", "notificacion", "resolucion", "reunion", "llamada", "nota", "otro"],"event_kind": ["audiencia", "vencimiento", "reunion", "tramite", "recordatorio"],"event_priority": ["normal", "alta", "critica"],"event_status": ["pendiente", "cumplido", "cancelado"],"matter_status": ["consulta", "activo", "en_espera", "cerrado", "archivado"],"non_working_day_kind": ["feriado", "feria_judicial", "inhabil"],"practice_area": ["familia", "sucesiones", "civil", "laboral", "violencia_genero", "otro"],"share_permission": ["lectura", "comentario"]
+            "app_role": ["titular", "colaborador"],"client_kind": ["persona", "empresa"],"document_type": ["DNI", "CUIT", "CUIL", "Pasaporte", "Otro"],"entry_kind": ["escrito", "audiencia", "notificacion", "resolucion", "reunion", "llamada", "nota", "otro"],"event_kind": ["audiencia", "vencimiento", "reunion", "tramite", "recordatorio", "escrito", "cedula"],"event_priority": ["normal", "alta", "critica"],"event_status": ["pendiente", "cumplido", "cancelado"],"matter_status": ["consulta", "activo", "en_espera", "cerrado", "archivado"],"non_working_day_kind": ["feriado", "feria_judicial", "inhabil"],"practice_area": ["familia", "sucesiones", "civil", "laboral", "violencia_genero", "otro"],"procedural_stage": ["iniciacion", "tramite", "prueba", "alegatos", "sentencia", "recursos", "ejecucion", "archivo"],"share_permission": ["lectura", "comentario"]
           }
         }
 } as const

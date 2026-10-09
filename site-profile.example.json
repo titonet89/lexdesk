@@ -1,0 +1,35 @@
+{
+  "lawyer": {
+    "name": "Dra. Lucía Herrera",
+    "shortName": "Dra. Lucía Herrera",
+    "monogram": "LH",
+    "title": "Abogada",
+    "registration": "M.P. 0000",
+    "university": null,
+    "bio": ["Texto de presentación de la profesional."]
+  },
+  "whatsappNumber": "5493880000000",
+  "phoneDisplay": "+54 9 388 000-0000",
+  "email": "contacto@lexdesk.demo",
+  "instagram": null,
+  "offices": [
+    {
+      "id": "sede-principal",
+      "name": "San Salvador de Jujuy",
+      "street": "Av. Ejemplo 123",
+      "locality": "San Salvador de Jujuy",
+      "region": "Jujuy",
+      "postalCode": "Y4600",
+      "country": "AR",
+      "mapQuery": "Plaza Belgrano, San Salvador de Jujuy, Argentina",
+      "isPrimary": true
+    }
+  ],
+  "offersOnlineConsultations": true,
+  "officeHours": [],
+  "openingHoursSpecification": null,
+  "reviews": null,
+  "achievements": [],
+  "credentials": [],
+  "testimonials": []
+}

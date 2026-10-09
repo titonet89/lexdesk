@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+  <body style="margin:0;padding:24px;background:#faf7f2;font-family:Arial,Helvetica,sans-serif;color:#0f172a">
+    <table role="presentation" width="100%" style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:16px;padding:32px">
+      <tr>
+        <td>
+          <p style="margin:0 0 4px;font-size:12px;letter-spacing:3px;color:#86621f;text-transform:uppercase">Panel profesional</p>
+          <h1 style="margin:0 0 16px;font-family:Georgia,serif;font-size:24px;font-weight:normal">Te invitaron a colaborar</h1>
+          <p style="margin:0 0 16px;line-height:1.6">
+            Un estudio jurídico te invitó a su panel profesional en LexDesk para revisar expedientes que decida
+            compartir con vos.
+          </p>
+          <p style="margin:0 0 24px;line-height:1.6">
+            Tocá el botón para crear tu contraseña. Después vas a configurar la verificación en dos pasos.
+          </p>
+          <p style="margin:0 0 24px">
+            <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/acceso/nueva-clave"
+               style="display:inline-block;background:#b8892f;color:#0a1020;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:999px">
+              Aceptar invitación
+            </a>
+          </p>
+          <p style="margin:0;font-size:12px;color:#334155;line-height:1.5">
+            El enlace vence en 1 hora. Si no esperabas esta invitación, ignorá este mensaje.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

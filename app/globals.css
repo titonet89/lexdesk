@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  /* Paleta legal moderna */
+  --color-navy-950: #0a1020;
+  --color-navy-900: #0f172a;
+  --color-navy-800: #1e293b;
+  --color-navy-700: #334155;
+  /* Identidad de marca (estudio): dorado bronce sobre crema */
+  --color-slate-50: #faf7f2;
+  --color-cream-100: #f3ece1;
+  --color-gold-400: #dcb877;
+  --color-gold-500: #c9a053;
+  --color-gold-600: #b8892f;
+  --color-gold-700: #86621f;
+  --color-gold-50: #fbf5e9;
+
+  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Curvas de easing (patrones de micro-interacción de Emil Kowalski) */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --animate-pulse-ring: pulse-ring 2s var(--ease-out-strong) infinite;
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    80%,
+    100% {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-slate-50);
+  color: var(--color-navy-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold-600);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

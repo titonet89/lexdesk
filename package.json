@@ -1,0 +1,51 @@
+{
+  "name": "lexdesk",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:types": "supabase gen types typescript --db-url postgresql://postgres:postgres@127.0.0.1:54322/postgres --schema public > lib/supabase/database.types.ts",
+    "db:reset": "supabase db reset",
+    "admin:crear-titular": "node --env-file=.env.local scripts/crear-titular.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:db": "supabase test db --db-url postgresql://postgres:postgres@127.0.0.1:54322/postgres",
+    "db:seed-demo": "node --env-file=.env.local scripts/seed-demo.mjs"
+  },
+  "dependencies": {
+    "@date-fns/tz": "^1.5.0",
+    "@hookform/resolvers": "^5.9.1",
+    "@radix-ui/react-dialog": "^1.2.0",
+    "@radix-ui/react-label": "^2.1.16",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "framer-motion": "^14.0.0",
+    "lucide-react": "^1.52.0",
+    "next": "16.3.8",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-hook-form": "^7.89.0",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.8",
+    "schema-dts": "^2.1.0",
+    "supabase": "^2.120.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "description": "Gestión de estudios jurídicos (Argentina): sitio público + panel con expedientes, agenda de plazos procesales, documentos y colaboración segura."
+}

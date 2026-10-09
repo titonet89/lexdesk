@@ -108,7 +108,7 @@ export function EnrollTotpForm() {
         {enrollment ? (
           // Fondo blanco y margen ("zona silenciosa") para que cualquier app lo lea bien.
           // eslint-disable-next-line @next/next/no-img-element -- QR en data URI generado por el servidor de auth
-          <img src={enrollment.qrCode} alt="Código QR para la app de autenticación" className="size-56 rounded-lg bg-white p-3" />
+          <img src={enrollment.qrCode} alt="Código QR para la app de autenticación" className="size-72 max-w-full rounded-lg bg-white p-3 [image-rendering:pixelated]" />
         ) : (
           <div className="grid size-48 place-items-center text-ink-muted">
             <LoaderCircle className="size-6 animate-spin" aria-label="Generando código QR" />

@@ -38,6 +38,8 @@ export function EnrollTotpForm() {
 
       const { data, error: enrollError } = await supabase.auth.mfa.enroll({
         factorType: "totp",
+        // Nombre con el que aparece la cuenta en la app de autenticación.
+        issuer: "LexDesk",
         friendlyName: `Autenticador ${new Date().toISOString().slice(0, 10)}`,
       });
       if (enrollError || !data) {
@@ -89,20 +91,24 @@ export function EnrollTotpForm() {
     <div className="mt-6 space-y-5" data-testid="enroll-form">
       <ol className="space-y-1.5 text-sm text-ink-soft">
         <li>
-          <strong>1.</strong> Instalá Google Authenticator o Microsoft Authenticator en tu celular.
+          <strong>1.</strong> Instalá <strong>Google Authenticator</strong> o Microsoft Authenticator en tu celular.
         </li>
         <li>
-          <strong>2.</strong> Escaneá este código QR desde la app.
+          <strong>2.</strong> Abrí la app, tocá <strong>“+”</strong> y elegí <strong>“Escanear un código QR”</strong>.
         </li>
         <li>
-          <strong>3.</strong> Ingresá el código de 6 dígitos que aparece.
+          <strong>3.</strong> Ingresá abajo el código de 6 dígitos que aparece en la app.
         </li>
       </ol>
+      <p className="rounded-xl bg-warning-soft px-3 py-2 text-xs text-warning-ink">
+        No uses la cámara del celular: el código se escanea <strong>desde adentro de la app</strong>.
+      </p>
 
       <div className="grid place-items-center rounded-2xl border border-ink/10 bg-surface p-4">
         {enrollment ? (
+          // Fondo blanco y margen ("zona silenciosa") para que cualquier app lo lea bien.
           // eslint-disable-next-line @next/next/no-img-element -- QR en data URI generado por el servidor de auth
-          <img src={enrollment.qrCode} alt="Código QR para la app de autenticación" className="size-48" />
+          <img src={enrollment.qrCode} alt="Código QR para la app de autenticación" className="size-56 rounded-lg bg-white p-3" />
         ) : (
           <div className="grid size-48 place-items-center text-ink-muted">
             <LoaderCircle className="size-6 animate-spin" aria-label="Generando código QR" />
@@ -126,6 +132,10 @@ export function EnrollTotpForm() {
               {copied ? "Copiada" : "Copiar"}
             </button>
           </div>
+          <p className="mt-2 text-xs text-ink-muted">
+            En la app: “+” → “Ingresar una clave de configuración”. Nombre: <strong>LexDesk</strong>; clave: la de arriba;
+            tipo: “Basada en el tiempo”.
+          </p>
         </details>
       ) : null}
 

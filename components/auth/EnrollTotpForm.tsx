@@ -87,7 +87,7 @@ export function EnrollTotpForm() {
 
   return (
     <div className="mt-6 space-y-5" data-testid="enroll-form">
-      <ol className="space-y-1.5 text-sm text-navy-800">
+      <ol className="space-y-1.5 text-sm text-ink-soft">
         <li>
           <strong>1.</strong> Instalá Google Authenticator o Microsoft Authenticator en tu celular.
         </li>
@@ -99,19 +99,19 @@ export function EnrollTotpForm() {
         </li>
       </ol>
 
-      <div className="grid place-items-center rounded-2xl border border-navy-900/10 bg-white p-4">
+      <div className="grid place-items-center rounded-2xl border border-ink/10 bg-surface p-4">
         {enrollment ? (
           // eslint-disable-next-line @next/next/no-img-element -- QR en data URI generado por el servidor de auth
           <img src={enrollment.qrCode} alt="Código QR para la app de autenticación" className="size-48" />
         ) : (
-          <div className="grid size-48 place-items-center text-navy-700">
+          <div className="grid size-48 place-items-center text-ink-muted">
             <LoaderCircle className="size-6 animate-spin" aria-label="Generando código QR" />
           </div>
         )}
       </div>
 
       {enrollment ? (
-        <details className="rounded-xl bg-slate-50 px-4 py-3 text-sm text-navy-800">
+        <details className="rounded-xl bg-canvas px-4 py-3 text-sm text-ink-soft">
           <summary className="cursor-pointer font-medium">¿No podés escanear? Ingresá la clave manualmente</summary>
           <div className="mt-2 flex items-center gap-2">
             <code className="min-w-0 flex-1 break-all font-mono text-xs" data-testid="totp-secret">
@@ -120,7 +120,7 @@ export function EnrollTotpForm() {
             <button
               type="button"
               onClick={copySecret}
-              className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-gold-700 hover:bg-gold-50"
+              className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-accent-ink hover:bg-accent-soft"
             >
               <Copy className="size-3.5" aria-hidden="true" />
               {copied ? "Copiada" : "Copiar"}

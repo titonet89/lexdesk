@@ -17,7 +17,7 @@ export function SignOutButton({ variant = "sidebar", className }: SignOutButtonP
         type="submit"
         className={cn(
           variant === "link"
-            ? "text-sm font-medium text-navy-700 underline-offset-4 hover:text-navy-900 hover:underline"
+            ? "text-sm font-medium text-ink-muted underline-offset-4 hover:text-ink hover:underline"
             : "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-white",
           className,
         )}

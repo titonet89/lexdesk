@@ -15,8 +15,8 @@ export default async function NewPasswordPage() {
 
   return (
     <>
-      <h1 className="font-serif text-3xl tracking-tight text-navy-900">Crear contraseña</h1>
-      <p className="mt-1.5 text-navy-700">Elegí una contraseña segura que no uses en otros sitios.</p>
+      <h1 className="font-serif text-3xl tracking-tight text-ink">Crear contraseña</h1>
+      <p className="mt-1.5 text-ink-muted">Elegí una contraseña segura que no uses en otros sitios.</p>
       <NewPasswordForm />
     </>
   );

@@ -35,7 +35,7 @@ export function RecoverPasswordForm() {
 
   if (sent) {
     return (
-      <p role="status" className="mt-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+      <p role="status" className="mt-6 rounded-xl bg-success-soft px-4 py-3 text-sm text-success-ink">
         Si el email corresponde a un usuario del panel, en unos minutos vas a recibir el enlace. Revisá también
         la carpeta de spam.
       </p>

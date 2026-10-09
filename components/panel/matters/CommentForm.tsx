@@ -22,7 +22,7 @@ export function CommentForm({ matterId }: { matterId: string }) {
       <Field label="Observación" htmlFor="comment-body" error={state.fieldErrors.body}>
         <Textarea id="comment-body" name="body" rows={3} placeholder="Escribí tu opinión o sugerencia sobre el expediente…" />
       </Field>
-      <p className="text-xs text-navy-700/70">Los comentarios quedan registrados y no se pueden editar ni borrar.</p>
+      <p className="text-xs text-ink-muted/70">Los comentarios quedan registrados y no se pueden editar ni borrar.</p>
       <div className="flex justify-end">
         <SubmitButton pendingLabel="Publicando…">
           <MessageSquare aria-hidden="true" />

@@ -24,7 +24,7 @@ export default function AccessLayout({ children }: LayoutProps<"/acceso">) {
           </span>
         </span>
       </Link>
-      <main id="contenido" className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
+      <main id="contenido" className="w-full max-w-md rounded-3xl bg-surface p-6 shadow-2xl sm:p-8">
         {children}
       </main>
       <p className="mt-6 max-w-sm text-center text-xs leading-relaxed text-slate-400">

@@ -71,7 +71,7 @@ export function LoginForm() {
           <button
             type="button"
             onClick={() => setShowPassword((value) => !value)}
-            className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-lg text-navy-700 hover:bg-navy-900/5"
+            className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-lg text-ink-muted hover:bg-ink/5"
             aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
           >
             {showPassword ? <EyeOff className="size-4.5" aria-hidden="true" /> : <Eye className="size-4.5" aria-hidden="true" />}
@@ -83,7 +83,7 @@ export function LoginForm() {
         {pending ? "Ingresando…" : "Ingresar"}
       </button>
       <p className="text-center text-sm">
-        <Link href="/acceso/recuperar" className="font-medium text-gold-700 underline-offset-4 hover:underline">
+        <Link href="/acceso/recuperar" className="font-medium text-accent-ink underline-offset-4 hover:underline">
           ¿Olvidaste tu contraseña?
         </Link>
       </p>

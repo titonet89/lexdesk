@@ -41,7 +41,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/panel/cl
 
       <form className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center" role="search">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-navy-700/60" aria-hidden="true" />
+          <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-ink-muted/60" aria-hidden="true" />
           <Input
             name="q"
             type="search"
@@ -54,7 +54,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/panel/cl
         {showArchived ? <input type="hidden" name="archivados" value="1" /> : null}
         <Link
           href={showArchived ? "/panel/clientes" : "/panel/clientes?archivados=1"}
-          className="text-sm font-medium text-gold-700 underline-offset-4 hover:underline sm:ml-2"
+          className="text-sm font-medium text-accent-ink underline-offset-4 hover:underline sm:ml-2"
         >
           {showArchived ? "Ver activos" : "Ver archivados"}
         </Link>
@@ -62,14 +62,14 @@ export default async function ClientsPage({ searchParams }: PageProps<"/panel/cl
 
       <Card>
         {clients && clients.length > 0 ? (
-          <ul className="divide-y divide-navy-900/8" data-testid="clients-list">
+          <ul className="divide-y divide-ink/8" data-testid="clients-list">
             {clients.map((client) => {
               const matterCount = client.matters[0]?.count ?? 0;
               return (
                 <li key={client.id}>
                   <Link
                     href={`/panel/clientes/${client.id}`}
-                    className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50"
+                    className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-canvas"
                   >
                     <span className="grid size-10 shrink-0 place-items-center rounded-full bg-navy-900 font-serif text-sm text-gold-400">
                       {client.full_name
@@ -80,8 +80,8 @@ export default async function ClientsPage({ searchParams }: PageProps<"/panel/cl
                         .toUpperCase()}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold text-navy-900">{client.full_name}</span>
-                      <span className="block truncate text-sm text-navy-700">
+                      <span className="block truncate font-semibold text-ink">{client.full_name}</span>
+                      <span className="block truncate text-sm text-ink-muted">
                         {[
                           client.document_number ? `${client.document_type ?? "Doc."} ${client.document_number}` : null,
                           client.phone,
@@ -94,7 +94,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/panel/cl
                     <Badge tone={matterCount > 0 ? "gold" : "neutral"}>
                       {matterCount} {matterCount === 1 ? "expediente" : "expedientes"}
                     </Badge>
-                    <ChevronRight className="size-4.5 shrink-0 text-navy-700/50" aria-hidden="true" />
+                    <ChevronRight className="size-4.5 shrink-0 text-ink-muted/50" aria-hidden="true" />
                   </Link>
                 </li>
               );

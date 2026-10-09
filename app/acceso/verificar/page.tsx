@@ -18,13 +18,13 @@ export default async function VerifyPage({ searchParams }: PageProps<"/acceso/ve
 
   return (
     <>
-      <h1 className="font-serif text-3xl tracking-tight text-navy-900">Verificación en dos pasos</h1>
-      <p className="mt-1.5 text-navy-700">
+      <h1 className="font-serif text-3xl tracking-tight text-ink">Verificación en dos pasos</h1>
+      <p className="mt-1.5 text-ink-muted">
         Abrí tu app de autenticación (Google Authenticator, Microsoft Authenticator, Authy…) e ingresá el
         código de 6 dígitos.
       </p>
       <VerifyTotpForm nextPath={nextPath} />
-      <div className="mt-6 border-t border-navy-900/8 pt-4 text-center">
+      <div className="mt-6 border-t border-ink/8 pt-4 text-center">
         <SignOutButton variant="link" />
       </div>
     </>

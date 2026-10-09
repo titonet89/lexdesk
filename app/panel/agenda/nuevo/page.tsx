@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/panel/ui";
 import { requireTitular } from "@/lib/auth/session";
 import { todayIso } from "@/lib/panel/dates";
 import { uuidSchema } from "@/lib/panel/schemas";
+import { Constants } from "@/lib/supabase/database.types";
 import { createEventAction } from "../actions";
 import { loadEventFormData } from "../data";
 
@@ -13,7 +14,8 @@ export const metadata: Metadata = { title: "Nuevo evento" };
 
 export default async function NewEventPage({ searchParams }: PageProps<"/panel/agenda/nuevo">) {
   const { active: organization } = await requireTitular();
-  const { expediente, fecha } = await searchParams;
+  const { expediente, fecha, tipo } = await searchParams;
+  const kind = Constants.public.Enums.event_kind.find((value) => value === tipo) ?? "vencimiento";
   const matterId = typeof expediente === "string" && uuidSchema.safeParse(expediente).success ? expediente : "";
   const date = typeof fecha === "string" && /^\d{4}-\d{2}-\d{2}$/.test(fecha) ? fecha : todayIso();
 
@@ -24,7 +26,7 @@ export default async function NewEventPage({ searchParams }: PageProps<"/panel/a
       <PageHeader
         title="Nuevo evento"
         eyebrow={
-          <Link href={matterId ? `/panel/expedientes/${matterId}?seccion=agenda` : "/panel/agenda"} className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href={matterId ? `/panel/expedientes/${matterId}?seccion=agenda` : "/panel/agenda"} className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             {matterId ? "Expediente" : "Agenda"}
           </Link>
@@ -39,7 +41,7 @@ export default async function NewEventPage({ searchParams }: PageProps<"/panel/a
         defaults={{
           matter_id: matterId,
           title: "",
-          kind: "vencimiento",
+          kind,
           priority: "normal",
           date,
           all_day: false,

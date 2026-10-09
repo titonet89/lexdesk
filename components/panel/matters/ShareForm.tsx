@@ -54,7 +54,7 @@ export function ShareForm({ matterId, collaborators, minDate }: ShareFormProps) 
         <Field label="Acceso hasta" htmlFor="share-expires" error={errors.expires_on} hint="Opcional. Recomendado.">
           <Input id="share-expires" name="expires_on" type="date" min={minDate} />
         </Field>
-        <label className="flex h-11 cursor-pointer items-center gap-3 text-sm text-navy-800">
+        <label className="flex h-11 cursor-pointer items-center gap-3 text-sm text-ink-soft">
           <input type="checkbox" name="include_documents" className="size-5 accent-gold-600" />
           Incluir documentos
         </label>

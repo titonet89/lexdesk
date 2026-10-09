@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -14,12 +14,16 @@ import {
   LogOut,
   Menu,
   Scale,
+  Search,
   Settings,
   Users,
   X,
   type LucideIcon,
 } from "lucide-react";
+import { CommandPalette, openCommandPalette } from "@/components/panel/CommandPalette";
+import { ThemeToggle } from "@/components/panel/ThemeToggle";
 import { signOutAction } from "@/lib/auth/actions";
+import type { Theme } from "@/lib/theme";
 import { switchOrganizationAction } from "@/lib/auth/org-actions";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +58,7 @@ interface Organization {
 }
 
 interface PanelShellProps {
+  initialTheme: Theme;
   role: Role;
   displayName: string;
   activeOrganization: { id: string; name: string };
@@ -151,7 +156,14 @@ function SidebarContent({
   activeOrganization,
   organizations,
   onNavigate,
-}: Omit<PanelShellProps, "children"> & { items: NavItem[]; onNavigate?: () => void }) {
+  theme,
+  onThemeChange,
+}: Omit<PanelShellProps, "children" | "initialTheme"> & {
+  items: NavItem[];
+  onNavigate?: () => void;
+  theme: Theme;
+  onThemeChange: (theme: Theme) => void;
+}) {
   return (
     <div className="flex h-full flex-col">
       <Link href="/panel" onClick={onNavigate} className="flex items-center gap-2.5 px-2 text-white">
@@ -163,15 +175,30 @@ function SidebarContent({
         </span>
       </Link>
 
-      <div className="mt-6">
+      <div className="mt-6 space-y-2">
         <OrganizationSwitcher active={activeOrganization} organizations={organizations} />
+        <button
+          type="button"
+          onClick={() => {
+            onNavigate?.();
+            openCommandPalette();
+          }}
+          className="flex w-full items-center gap-3 rounded-xl border border-white/10 px-3 py-2 text-sm text-slate-400 transition-colors hover:border-white/20 hover:text-white"
+          data-testid="open-command-palette"
+        >
+          <Search className="size-4" aria-hidden="true" />
+          <span className="flex-1 text-left">Buscar…</span>
+          <kbd className="rounded border border-white/15 px-1.5 text-[10px] text-slate-400">Ctrl K</kbd>
+        </button>
       </div>
 
       <nav aria-label="Panel" className="mt-6 flex-1">
         <NavLinks items={items} onNavigate={onNavigate} />
       </nav>
 
-      <div className="border-t border-white/10 pt-4">
+      <div className="space-y-3 border-t border-white/10 pt-4">
+        <ThemeToggle theme={theme} onChange={onThemeChange} />
+        <div>
         <p className="truncate px-3 text-sm font-semibold text-white">{displayName}</p>
         <p className="px-3 text-xs text-slate-400">{role === "titular" ? "Titular" : "Colaborador/a"}</p>
         <form action={() => signOutAction()} className="mt-3">
@@ -183,18 +210,29 @@ function SidebarContent({
             Cerrar sesión
           </button>
         </form>
+        </div>
       </div>
     </div>
   );
 }
 
-export function PanelShell({ role, displayName, activeOrganization, organizations, children }: PanelShellProps) {
+export function PanelShell({ initialTheme, role, displayName, activeOrganization, organizations, children }: PanelShellProps) {
   const [open, setOpen] = useState(false);
+  const [theme, setTheme] = useState<Theme>(initialTheme);
   const items = role === "titular" ? titularNav : collaboratorNav;
-  const sidebarProps = { role, displayName, activeOrganization, organizations, items };
+  const sidebarProps = { role, displayName, activeOrganization, organizations, items, theme, onThemeChange: setTheme };
+
+  // El tema también se aplica a <html> para que los diálogos (que se montan fuera del panel) lo hereden.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.theme = theme;
+    return () => {
+      delete root.dataset.theme;
+    };
+  }, [theme]);
 
   return (
-    <div className="min-h-dvh bg-slate-50">
+    <div className="min-h-dvh bg-canvas text-ink" data-theme={theme}>
       <a
         href="#panel-contenido"
         className="sr-only rounded-full bg-gold-600 px-4 py-2 font-semibold text-navy-950 focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60]"
@@ -203,7 +241,7 @@ export function PanelShell({ role, displayName, activeOrganization, organization
       </a>
 
       {/* Barra lateral (escritorio) */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 bg-navy-900 px-4 py-6 lg:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-white/5 bg-navy-900 px-4 py-6 lg:block">
         <SidebarContent {...sidebarProps} />
       </aside>
 
@@ -213,6 +251,10 @@ export function PanelShell({ role, displayName, activeOrganization, organization
           <Scale className="size-5 shrink-0 text-gold-400" aria-hidden="true" />
           <span className="truncate font-serif text-base">{activeOrganization.name}</span>
         </Link>
+        <div className="flex items-center">
+        <button type="button" onClick={openCommandPalette} className="grid size-10 place-items-center rounded-lg" aria-label="Buscar">
+          <Search className="size-5" aria-hidden="true" />
+        </button>
         <Dialog.Root open={open} onOpenChange={setOpen}>
           <Dialog.Trigger className="grid size-10 place-items-center rounded-lg" aria-label="Abrir menú del panel">
             <Menu className="size-6" aria-hidden="true" />
@@ -232,11 +274,13 @@ export function PanelShell({ role, displayName, activeOrganization, organization
             </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
+        </div>
       </header>
 
       <main id="panel-contenido" className="px-4 py-6 sm:px-6 lg:ml-64 lg:px-10 lg:py-10">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
+      <CommandPalette role={role} />
     </div>
   );
 }

@@ -91,7 +91,7 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
       <PageHeader
         title={matter.title}
         eyebrow={
-          <Link href={isTitular ? "/panel/expedientes" : "/panel"} className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href={isTitular ? "/panel/expedientes" : "/panel"} className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             {isTitular ? "Expedientes" : "Compartidos conmigo"}
           </Link>
@@ -106,7 +106,7 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
         actions={
           isTitular ? (
             <>
-              <Link href={`/panel/agenda/nuevo?expediente=${id}`} className={buttonClasses("ghost", "md", "border border-navy-900/15")}>
+              <Link href={`/panel/agenda/nuevo?expediente=${id}`} className={buttonClasses("ghost", "md", "border border-ink/15")}>
                 <CalendarPlus aria-hidden="true" />
                 Agendar
               </Link>
@@ -136,7 +136,7 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
       </div>
 
       <nav aria-label="Secciones del expediente" className="-mx-4 mb-5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <ul className="flex w-max gap-1 rounded-xl bg-navy-900/5 p-1">
+        <ul className="flex w-max gap-1 rounded-xl bg-ink/5 p-1">
           {visibleSections.map((section) => (
             <li key={section.id}>
               <Link
@@ -144,7 +144,7 @@ export default async function MatterDetailPage({ params, searchParams }: PagePro
                 aria-current={active === section.id ? "page" : undefined}
                 className={cn(
                   "block rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors",
-                  active === section.id ? "bg-white text-navy-900 shadow-sm" : "text-navy-700 hover:text-navy-900",
+                  active === section.id ? "bg-surface text-ink shadow-sm" : "text-ink-muted hover:text-ink",
                 )}
               >
                 {section.label}
@@ -189,7 +189,7 @@ function SummarySection({ matter, isTitular }: { matter: MatterWithClient; isTit
     {
       label: "Cliente",
       value: isTitular && matter.clients ? (
-        <Link href={`/panel/clientes/${matter.clients.id}`} className="font-medium text-gold-700 hover:underline">
+        <Link href={`/panel/clientes/${matter.clients.id}`} className="font-medium text-accent-ink hover:underline">
           {matter.clients.full_name}
         </Link>
       ) : null,
@@ -204,11 +204,11 @@ function SummarySection({ matter, isTitular }: { matter: MatterWithClient; isTit
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
       <Card className="h-fit">
         <CardHeader title="Datos" />
-        <dl className="divide-y divide-navy-900/8">
+        <dl className="divide-y divide-ink/8">
           {rows.map((row) => (
             <div key={row.label} className="flex justify-between gap-4 px-5 py-3 text-sm">
-              <dt className="text-navy-700">{row.label}</dt>
-              <dd className="text-right text-navy-900">{row.value}</dd>
+              <dt className="text-ink-muted">{row.label}</dt>
+              <dd className="text-right text-ink">{row.value}</dd>
             </div>
           ))}
         </dl>
@@ -217,9 +217,9 @@ function SummarySection({ matter, isTitular }: { matter: MatterWithClient; isTit
         <CardHeader title="Descripción y estrategia" />
         <div className="p-5">
           {matter.description ? (
-            <p className="leading-relaxed whitespace-pre-line text-navy-800">{matter.description}</p>
+            <p className="leading-relaxed whitespace-pre-line text-ink-soft">{matter.description}</p>
           ) : (
-            <p className="text-navy-700">Sin descripción.</p>
+            <p className="text-ink-muted">Sin descripción.</p>
           )}
         </div>
       </Card>
@@ -251,7 +251,7 @@ async function EntriesSection({ matterId, isTitular }: { matterId: string; isTit
               <li key={entry.id} className="relative border-l-2 border-gold-600/30 pb-6 pl-6 last:pb-1">
                 <span className="absolute top-1 -left-[7px] size-3 rounded-full border-2 border-white bg-gold-600" aria-hidden="true" />
                 <div className="flex flex-wrap items-center gap-2">
-                  <time dateTime={entry.occurred_on} className="text-sm font-semibold text-navy-900">
+                  <time dateTime={entry.occurred_on} className="text-sm font-semibold text-ink">
                     {formatDateOnly(entry.occurred_on, "d MMM yyyy")}
                   </time>
                   <Badge>{entryKindLabels[entry.kind]}</Badge>
@@ -268,8 +268,8 @@ async function EntriesSection({ matterId, isTitular }: { matterId: string; isTit
                     </ConfirmActionButton>
                   ) : null}
                 </div>
-                <p className="mt-1 font-medium text-navy-900">{entry.summary}</p>
-                {entry.details ? <p className="mt-1 text-sm whitespace-pre-line text-navy-700">{entry.details}</p> : null}
+                <p className="mt-1 font-medium text-ink">{entry.summary}</p>
+                {entry.details ? <p className="mt-1 text-sm whitespace-pre-line text-ink-muted">{entry.details}</p> : null}
               </li>
             ))}
           </ol>
@@ -301,19 +301,19 @@ async function AgendaSection({ matterId }: { matterId: string }) {
         }
       />
       {events && events.length > 0 ? (
-        <ul className="divide-y divide-navy-900/8">
+        <ul className="divide-y divide-ink/8">
           {events.map((event) => (
             <li key={event.id}>
-              <Link href={`/panel/agenda/${event.id}`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50">
+              <Link href={`/panel/agenda/${event.id}`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-canvas">
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-center gap-2">
-                    <span className={cn("font-medium text-navy-900", event.status !== "pendiente" && "text-navy-700 line-through")}>
+                    <span className={cn("font-medium text-ink", event.status !== "pendiente" && "text-ink-muted line-through")}>
                       {event.title}
                     </span>
                     <Badge tone={eventKindTones[event.kind]}>{eventKindLabels[event.kind]}</Badge>
                     {event.status !== "pendiente" ? <Badge>{eventStatusLabels[event.status]}</Badge> : null}
                   </span>
-                  <span className="text-sm text-navy-700">
+                  <span className="text-sm text-ink-muted">
                     {formatInZone(event.starts_at, event.all_day ? "EEEE d MMM yyyy" : "EEEE d MMM yyyy · HH:mm 'h'")} ·{" "}
                     {relativeDayLabel(event.starts_at)}
                   </span>
@@ -343,13 +343,13 @@ async function DocumentsSection({ matterId, isTitular }: { matterId: string; isT
       <Card>
         <CardHeader title="Documentos" description="Las descargas generan un enlace temporal y quedan registradas." />
         {documents && documents.length > 0 ? (
-          <ul className="divide-y divide-navy-900/8" data-testid="documents-list">
+          <ul className="divide-y divide-ink/8" data-testid="documents-list">
             {documents.map((document) => (
               <li key={document.id} className="flex items-center gap-3 px-5 py-3">
-                <FileText className="size-5 shrink-0 text-gold-700" aria-hidden="true" />
+                <FileText className="size-5 shrink-0 text-accent-ink" aria-hidden="true" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium text-navy-900">{document.name}</span>
-                  <span className="text-xs text-navy-700">
+                  <span className="block truncate font-medium text-ink">{document.name}</span>
+                  <span className="text-xs text-ink-muted">
                     {formatBytes(document.size_bytes)} · {formatInZone(document.created_at, "d MMM yyyy")}
                   </span>
                 </span>
@@ -436,14 +436,14 @@ async function CollaborationSection({
           <CardHeader title="Acceso de colegas" description="Compartí este expediente para pedir una opinión." />
           <div className="space-y-5 p-5">
             {isSensitive ? (
-              <p className="flex items-start gap-2 rounded-xl bg-gold-50 px-4 py-3 text-sm text-navy-800">
-                <Lock className="mt-0.5 size-4 shrink-0 text-gold-700" aria-hidden="true" />
+              <p className="flex items-start gap-2 rounded-xl bg-accent-soft px-4 py-3 text-sm text-ink-soft">
+                <Lock className="mt-0.5 size-4 shrink-0 text-accent-ink" aria-hidden="true" />
                 Este expediente está marcado como sensible y no puede compartirse.
               </p>
             ) : collaborators.length === 0 ? (
-              <p className="text-sm text-navy-700">
+              <p className="text-sm text-ink-muted">
                 Todavía no invitaste colaboradores.{" "}
-                <Link href="/panel/colaboradores" className="font-medium text-gold-700 hover:underline">
+                <Link href="/panel/colaboradores" className="font-medium text-accent-ink hover:underline">
                   Invitar a un colega
                 </Link>
               </p>
@@ -452,14 +452,14 @@ async function CollaborationSection({
             )}
 
             {shares.length > 0 ? (
-              <ul className="divide-y divide-navy-900/8 rounded-xl border border-navy-900/8" data-testid="shares-list">
+              <ul className="divide-y divide-ink/8 rounded-xl border border-ink/8" data-testid="shares-list">
                 {shares.map((share) => (
                   <li key={share.id} className="flex items-center gap-3 px-4 py-3 text-sm">
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-medium text-navy-900">
+                      <span className="block truncate font-medium text-ink">
                         {share.profiles?.full_name || share.profiles?.email}
                       </span>
-                      <span className="text-navy-700">
+                      <span className="text-ink-muted">
                         {sharePermissionLabels[share.permission]}
                         {share.include_documents ? " · con documentos" : ""}
                         {share.expires_at ? ` · hasta ${formatInZone(share.expires_at, "d MMM yyyy")}` : " · sin vencimiento"}
@@ -488,13 +488,13 @@ async function CollaborationSection({
           {comments && comments.length > 0 ? (
             <ul className="space-y-4" data-testid="comments-list">
               {comments.map((comment) => (
-                <li key={comment.id} className="rounded-xl bg-slate-50 p-4">
+                <li key={comment.id} className="rounded-xl bg-canvas p-4">
                   <p className="flex flex-wrap items-center gap-2 text-sm">
-                    <span className="font-semibold text-navy-900">{comment.profiles?.full_name || comment.profiles?.email}</span>
+                    <span className="font-semibold text-ink">{comment.profiles?.full_name || comment.profiles?.email}</span>
                     {authorBadge(comment.author_id)}
-                    <span className="text-navy-700">{formatInZone(comment.created_at, "d MMM yyyy · HH:mm")}</span>
+                    <span className="text-ink-muted">{formatInZone(comment.created_at, "d MMM yyyy · HH:mm")}</span>
                   </p>
-                  <p className="mt-2 text-sm leading-relaxed whitespace-pre-line text-navy-800">{comment.body}</p>
+                  <p className="mt-2 text-sm leading-relaxed whitespace-pre-line text-ink-soft">{comment.body}</p>
                 </li>
               ))}
             </ul>
@@ -502,7 +502,7 @@ async function CollaborationSection({
             <EmptyState icon={<MessageSquare aria-hidden="true" />} title="Sin observaciones" />
           )}
           {canComment ? <CommentForm matterId={matterId} /> : (
-            <p className="text-sm text-navy-700">Tenés acceso de solo lectura a este expediente.</p>
+            <p className="text-sm text-ink-muted">Tenés acceso de solo lectura a este expediente.</p>
           )}
         </div>
       </Card>

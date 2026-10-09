@@ -43,10 +43,18 @@ documentos y colaboración segura entre colegas.
 | **Colaboración** | Compartir un expediente puntual con un colega (lectura o comentarios, con vencimiento opcional). |
 | **Auditoría** | Quién creó, modificó, borró, vio o descargó qué y cuándo. |
 | **Multi-estudio** | Cada estudio con sus datos aislados; un colega puede colaborar con varios estudios y cambiar entre ellos. |
+| **Paleta de comandos** | `Ctrl + K`: buscar expedientes y clientes, crear un expediente, cliente o vencimiento y navegar sin mouse. |
+| **Modo oscuro** | Claro, oscuro o según el sistema, con colores semánticos y contraste AA. |
+| **WhatsApp** | Botón directo en la ficha del cliente: normaliza teléfonos argentinos (0, 15, 549) al formato internacional. |
 
 <p align="center">
   <img src="docs/screenshots/sitio-publico.png" alt="Sitio público del estudio" width="66%" />
   <img src="docs/screenshots/sitio-movil.png" alt="Sitio público en el celular" width="22%" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/panel-paleta.png" alt="Paleta de comandos con búsqueda de expedientes y clientes" width="49%" />
+  <img src="docs/screenshots/panel-oscuro.png" alt="Panel en modo oscuro" width="49%" />
 </p>
 
 <p align="center">
@@ -146,7 +154,7 @@ docs/                    arquitectura y estrategia de seguridad
 ## 🗺️ Roadmap
 
 - [x] Multi-estudio (SaaS): datos aislados por organización.
-- [ ] Modo oscuro, paleta de comandos (Ctrl+K) y acciones rápidas globales.
+- [x] Modo oscuro, paleta de comandos (Ctrl+K) y acciones rápidas globales.
 - [ ] Vista Kanban de expedientes por etapa procesal y vista semanal de agenda.
 - [ ] Honorarios y gastos por expediente.
 - [ ] Alertas de vencimientos (24 h y 3 días antes) por email.

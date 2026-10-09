@@ -30,7 +30,7 @@ export default async function NewMatterPage({ searchParams }: PageProps<"/panel/
       <PageHeader
         title="Nuevo expediente"
         eyebrow={
-          <Link href="/panel/expedientes" className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href="/panel/expedientes" className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             Expedientes
           </Link>

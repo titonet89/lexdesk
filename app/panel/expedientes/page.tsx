@@ -50,7 +50,7 @@ export default async function MattersPage({ searchParams }: PageProps<"/panel/ex
 
       <form className="mb-4 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]" role="search">
         <div className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-navy-700/60" aria-hidden="true" />
+          <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-ink-muted/60" aria-hidden="true" />
           <Input name="q" type="search" defaultValue={query} placeholder="Buscar por carátula o número…" aria-label="Buscar expedientes" className="pl-10" />
         </div>
         <Select name="estado" defaultValue={status ?? ""} aria-label="Estado">
@@ -76,13 +76,13 @@ export default async function MattersPage({ searchParams }: PageProps<"/panel/ex
 
       <Card>
         {matters && matters.length > 0 ? (
-          <ul className="divide-y divide-navy-900/8" data-testid="matters-list">
+          <ul className="divide-y divide-ink/8" data-testid="matters-list">
             {matters.map((matter) => (
               <li key={matter.id}>
-                <Link href={`/panel/expedientes/${matter.id}`} className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50">
+                <Link href={`/panel/expedientes/${matter.id}`} className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-canvas">
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold text-navy-900">{matter.title}</span>
+                      <span className="font-semibold text-ink">{matter.title}</span>
                       <Badge tone={matterStatusTones[matter.status]}>{matterStatusLabels[matter.status]}</Badge>
                       {matter.is_sensitive ? (
                         <Badge tone="gold">
@@ -91,7 +91,7 @@ export default async function MattersPage({ searchParams }: PageProps<"/panel/ex
                         </Badge>
                       ) : null}
                     </span>
-                    <span className="mt-1 block truncate text-sm text-navy-700">
+                    <span className="mt-1 block truncate text-sm text-ink-muted">
                       {[
                         matter.clients?.full_name,
                         practiceAreaLabels[matter.area],
@@ -103,7 +103,7 @@ export default async function MattersPage({ searchParams }: PageProps<"/panel/ex
                         .join(" · ")}
                     </span>
                   </span>
-                  <ChevronRight className="size-4.5 shrink-0 text-navy-700/50" aria-hidden="true" />
+                  <ChevronRight className="size-4.5 shrink-0 text-ink-muted/50" aria-hidden="true" />
                 </Link>
               </li>
             ))}

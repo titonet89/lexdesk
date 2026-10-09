@@ -4,7 +4,10 @@ import { notFound } from "next/navigation";
 import { Archive, ArrowLeft, FolderOpen, Mail, MapPin, Pencil, Phone, Plus } from "lucide-react";
 import { Badge, Card, CardHeader, EmptyState, PageHeader } from "@/components/panel/ui";
 import { buttonClasses } from "@/components/ui/button";
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 import { requireTitular } from "@/lib/auth/session";
+import { firstName } from "@/lib/panel/names";
+import { whatsAppLink } from "@/lib/panel/phone";
 import { formatDateOnly } from "@/lib/panel/dates";
 import { matterStatusLabels, matterStatusTones, practiceAreaLabels } from "@/lib/panel/labels";
 import { uuidSchema } from "@/lib/panel/schemas";
@@ -14,7 +17,7 @@ import { toggleArchiveClientAction } from "../actions";
 export const metadata: Metadata = { title: "Cliente" };
 
 export default async function ClientDetailPage({ params }: PageProps<"/panel/clientes/[id]">) {
-  await requireTitular();
+  const { active: organization } = await requireTitular();
   const { id } = await params;
   if (!uuidSchema.safeParse(id).success) notFound();
 
@@ -30,6 +33,10 @@ export default async function ClientDetailPage({ params }: PageProps<"/panel/cli
   if (!client) notFound();
 
   const archived = Boolean(client.archived_at);
+  const whatsapp = whatsAppLink(
+    client.phone,
+    `Hola ${firstName(client.full_name)}, te escribo desde ${organization.organizationName}.`,
+  );
   const contactRows = [
     { icon: Phone, value: client.phone, href: client.phone ? `tel:${client.phone.replace(/[^\d+]/g, "")}` : null },
     { icon: Mail, value: client.email, href: client.email ? `mailto:${client.email}` : null },
@@ -41,7 +48,7 @@ export default async function ClientDetailPage({ params }: PageProps<"/panel/cli
       <PageHeader
         title={client.full_name}
         eyebrow={
-          <Link href="/panel/clientes" className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href="/panel/clientes" className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             Clientes
           </Link>
@@ -51,7 +58,19 @@ export default async function ClientDetailPage({ params }: PageProps<"/panel/cli
         }
         actions={
           <>
-            <Link href={`/panel/clientes/${id}/editar`} className={buttonClasses("ghost", "md", "border border-navy-900/15")}>
+            {whatsapp ? (
+              <a
+                href={whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonClasses("ghost", "md", "border border-ink/15")}
+                data-testid="client-whatsapp"
+              >
+                <WhatsAppIcon className="text-[#25D366]" />
+                WhatsApp
+              </a>
+            ) : null}
+            <Link href={`/panel/clientes/${id}/editar`} className={buttonClasses("ghost", "md", "border border-ink/15")}>
               <Pencil aria-hidden="true" />
               Editar
             </Link>
@@ -64,7 +83,7 @@ export default async function ClientDetailPage({ params }: PageProps<"/panel/cli
       />
 
       {archived ? (
-        <p className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">Este cliente está archivado.</p>
+        <p className="mb-4 rounded-xl bg-warning-soft px-4 py-3 text-sm text-warning-ink">Este cliente está archivado.</p>
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
@@ -73,8 +92,8 @@ export default async function ClientDetailPage({ params }: PageProps<"/panel/cli
           <div className="space-y-3 p-5 text-sm">
             {contactRows.length > 0 ? (
               contactRows.map(({ icon: Icon, value, href }) => (
-                <p key={value} className="flex items-start gap-3 text-navy-800">
-                  <Icon className="mt-0.5 size-4 shrink-0 text-gold-700" aria-hidden="true" />
+                <p key={value} className="flex items-start gap-3 text-ink-soft">
+                  <Icon className="mt-0.5 size-4 shrink-0 text-accent-ink" aria-hidden="true" />
                   {href ? (
                     <a href={href} className="break-all underline-offset-4 hover:underline">
                       {value}
@@ -85,12 +104,12 @@ export default async function ClientDetailPage({ params }: PageProps<"/panel/cli
                 </p>
               ))
             ) : (
-              <p className="text-navy-700">Sin datos de contacto.</p>
+              <p className="text-ink-muted">Sin datos de contacto.</p>
             )}
             {client.notes ? (
-              <div className="border-t border-navy-900/8 pt-3">
-                <p className="text-xs font-semibold tracking-wide text-navy-700/70 uppercase">Notas</p>
-                <p className="mt-1 whitespace-pre-line text-navy-800">{client.notes}</p>
+              <div className="border-t border-ink/8 pt-3">
+                <p className="text-xs font-semibold tracking-wide text-ink-muted/70 uppercase">Notas</p>
+                <p className="mt-1 whitespace-pre-line text-ink-soft">{client.notes}</p>
               </div>
             ) : null}
             <form
@@ -98,9 +117,9 @@ export default async function ClientDetailPage({ params }: PageProps<"/panel/cli
                 "use server";
                 await toggleArchiveClientAction(id, !archived);
               }}
-              className="border-t border-navy-900/8 pt-3"
+              className="border-t border-ink/8 pt-3"
             >
-              <button type="submit" className="inline-flex items-center gap-2 text-sm font-medium text-navy-700 hover:text-navy-900">
+              <button type="submit" className="inline-flex items-center gap-2 text-sm font-medium text-ink-muted hover:text-ink">
                 <Archive className="size-4" aria-hidden="true" />
                 {archived ? "Desarchivar cliente" : "Archivar cliente"}
               </button>
@@ -111,15 +130,15 @@ export default async function ClientDetailPage({ params }: PageProps<"/panel/cli
         <Card>
           <CardHeader title="Expedientes" description={`${matters?.length ?? 0} en total`} />
           {matters && matters.length > 0 ? (
-            <ul className="divide-y divide-navy-900/8">
+            <ul className="divide-y divide-ink/8">
               {matters.map((matter) => (
                 <li key={matter.id}>
-                  <Link href={`/panel/expedientes/${matter.id}`} className="block px-5 py-4 transition-colors hover:bg-slate-50">
+                  <Link href={`/panel/expedientes/${matter.id}`} className="block px-5 py-4 transition-colors hover:bg-canvas">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold text-navy-900">{matter.title}</span>
+                      <span className="font-semibold text-ink">{matter.title}</span>
                       <Badge tone={matterStatusTones[matter.status]}>{matterStatusLabels[matter.status]}</Badge>
                     </div>
-                    <p className="mt-1 text-sm text-navy-700">
+                    <p className="mt-1 text-sm text-ink-muted">
                       {practiceAreaLabels[matter.area]}
                       {matter.file_number ? ` · Expte. ${matter.file_number}` : ""} · Desde{" "}
                       {formatDateOnly(matter.opened_on, "d MMM yyyy")}

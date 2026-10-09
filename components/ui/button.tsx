@@ -14,8 +14,8 @@ const variants: Record<ButtonVariant, string> = {
   // Texto navy sobre dorado: contraste ~6:1 (blanco sobre dorado no alcanza AA).
   primary:
     "bg-gold-600 text-navy-950 shadow-[0_8px_24px_-8px_rgb(184_137_47/0.6)] hover:bg-gold-500 hover:shadow-[0_12px_28px_-8px_rgb(184_137_47/0.7)]",
-  secondary: "bg-navy-900 text-white hover:bg-navy-800",
-  ghost: "bg-transparent text-navy-900 hover:bg-navy-900/5",
+  secondary: "bg-ink text-surface hover:bg-ink-soft",
+  ghost: "bg-transparent text-ink hover:bg-ink/5",
   "outline-light":
     "border border-white/25 bg-white/5 text-white backdrop-blur-sm hover:border-white/50 hover:bg-white/10",
 };

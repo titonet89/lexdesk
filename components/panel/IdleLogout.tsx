@@ -51,12 +51,12 @@ export function IdleLogout() {
     <Dialog.Root open={secondsLeft !== null} onOpenChange={(open) => (!open ? markActive() : undefined)}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-navy-950/50" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl">
-          <span className="grid size-11 place-items-center rounded-xl bg-gold-50 text-gold-700">
+        <Dialog.Content className="fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-surface p-6 shadow-2xl">
+          <span className="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent-ink">
             <Clock className="size-5" aria-hidden="true" />
           </span>
-          <Dialog.Title className="mt-4 font-serif text-xl text-navy-900">¿Seguís ahí?</Dialog.Title>
-          <Dialog.Description className="mt-1.5 text-sm text-navy-700">
+          <Dialog.Title className="mt-4 font-serif text-xl text-ink">¿Seguís ahí?</Dialog.Title>
+          <Dialog.Description className="mt-1.5 text-sm text-ink-muted">
             Por seguridad, vamos a cerrar tu sesión en{" "}
             <strong className="tabular-nums">
               {secondsLeft !== null ? `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, "0")}` : ""}

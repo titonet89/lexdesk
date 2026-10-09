@@ -30,6 +30,20 @@ test("capturas del README", async ({ browser }) => {
   await page.waitForTimeout(500);
   await page.screenshot({ path: `${DIR}/panel-inicio.png` });
 
+  await page.keyboard.press("Control+K");
+  await page.getByPlaceholder("Buscar expedientes, clientes o acciones…").fill("gómez");
+  await page.getByTestId("command-list").getByRole("option").first().waitFor();
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: `${DIR}/panel-paleta.png` });
+  await page.keyboard.press("Escape");
+
+  await page.locator("aside").getByRole("button", { name: "Tema oscuro" }).click();
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: `${DIR}/panel-oscuro.png` });
+  await page.goto("/panel/agenda");
+  await page.screenshot({ path: `${DIR}/panel-agenda-oscuro.png` });
+  await page.locator("aside").getByRole("button", { name: "Tema claro" }).click();
+
   await page.goto("/panel/agenda");
   await page.screenshot({ path: `${DIR}/panel-agenda.png` });
 

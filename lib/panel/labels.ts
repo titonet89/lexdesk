@@ -60,7 +60,7 @@ export const eventKindDot: Record<Enums["event_kind"], string> = {
   audiencia: "bg-sky-500",
   vencimiento: "bg-red-500",
   reunion: "bg-gold-600",
-  tramite: "bg-navy-700",
+  tramite: "bg-slate-500",
   recordatorio: "bg-amber-500",
 };
 

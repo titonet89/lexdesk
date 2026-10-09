@@ -93,18 +93,18 @@ export function DocumentUploader({ matterId }: { matterId: string }) {
       />
       <label
         htmlFor={`upload-${matterId}`}
-        className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-navy-900/15 px-6 py-8 text-center transition-colors hover:border-gold-600/50 hover:bg-gold-50/40"
+        className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-ink/15 px-6 py-8 text-center transition-colors hover:border-gold-600/50 hover:bg-accent-soft/40"
       >
         {uploading ? (
           <>
-            <LoaderCircle className="size-6 animate-spin text-gold-700" aria-hidden="true" />
-            <span className="text-sm text-navy-800">Subiendo “{uploading}”…</span>
+            <LoaderCircle className="size-6 animate-spin text-accent-ink" aria-hidden="true" />
+            <span className="text-sm text-ink-soft">Subiendo “{uploading}”…</span>
           </>
         ) : (
           <>
-            <Upload className="size-6 text-gold-700" aria-hidden="true" />
+            <Upload className="size-6 text-accent-ink" aria-hidden="true" />
             <span className={buttonClasses("secondary", "sm", "pointer-events-none")}>Elegir archivos</span>
-            <span className="text-xs text-navy-700">PDF, imágenes, Word, Excel o texto · hasta 25 MB</span>
+            <span className="text-xs text-ink-muted">PDF, imágenes, Word, Excel o texto · hasta 25 MB</span>
           </>
         )}
       </label>

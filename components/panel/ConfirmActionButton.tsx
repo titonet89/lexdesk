@@ -34,7 +34,7 @@ export function ConfirmActionButton({
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-lg text-sm font-medium text-navy-700 transition-colors hover:text-red-700",
+          "inline-flex items-center gap-1.5 rounded-lg text-sm font-medium text-ink-muted transition-colors hover:text-danger-ink",
           className,
         )}
         aria-label={ariaLabel}
@@ -43,9 +43,9 @@ export function ConfirmActionButton({
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-navy-950/50" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl">
-          <Dialog.Title className="font-serif text-xl text-navy-900">{title}</Dialog.Title>
-          <Dialog.Description className="mt-1.5 text-sm text-navy-700">{description}</Dialog.Description>
+        <Dialog.Content className="fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-surface p-6 shadow-2xl">
+          <Dialog.Title className="font-serif text-xl text-ink">{title}</Dialog.Title>
+          <Dialog.Description className="mt-1.5 text-sm text-ink-muted">{description}</Dialog.Description>
           <div className="mt-6 flex justify-end gap-2">
             <Dialog.Close className={buttonClasses("ghost", "md")}>Cancelar</Dialog.Close>
             <button

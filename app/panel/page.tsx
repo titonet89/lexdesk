@@ -32,13 +32,13 @@ function Stat({ icon: Icon, label, value, href, alert }: { icon: LucideIcon; lab
   return (
     <Link
       href={href}
-      className="group rounded-2xl border border-navy-900/8 bg-white p-5 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-20px_rgb(15_23_42/0.3)]"
+      className="group rounded-2xl border border-ink/8 bg-surface p-5 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-20px_rgb(15_23_42/0.3)]"
     >
-      <span className={cn("grid size-10 place-items-center rounded-xl", alert ? "bg-red-50 text-red-700" : "bg-gold-50 text-gold-700")}>
+      <span className={cn("grid size-10 place-items-center rounded-xl", alert ? "bg-danger-soft text-danger-ink" : "bg-accent-soft text-accent-ink")}>
         <Icon className="size-5" aria-hidden="true" />
       </span>
-      <p className="mt-4 font-serif text-4xl leading-none text-navy-900 tabular-nums">{value}</p>
-      <p className="mt-1.5 text-sm text-navy-700">{label}</p>
+      <p className="mt-4 font-serif text-4xl leading-none text-ink tabular-nums">{value}</p>
+      <p className="mt-1.5 text-sm text-ink-muted">{label}</p>
     </Link>
   );
 }
@@ -60,19 +60,19 @@ async function CollaboratorHome({ displayName }: { displayName: string }) {
       <PageHeader title={`Hola, ${firstName(displayName)}`} description="Expedientes que te compartieron para revisar." />
       <Card>
         {active.length > 0 ? (
-          <ul className="divide-y divide-navy-900/8">
+          <ul className="divide-y divide-ink/8">
             {active.map((share) => (
               <li key={share.id}>
-                <Link href={`/panel/expedientes/${share.matters!.id}`} className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50">
-                  <FolderOpen className="size-5 shrink-0 text-gold-700" aria-hidden="true" />
+                <Link href={`/panel/expedientes/${share.matters!.id}`} className="flex items-center gap-4 px-5 py-4 hover:bg-canvas">
+                  <FolderOpen className="size-5 shrink-0 text-accent-ink" aria-hidden="true" />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-semibold text-navy-900">{share.matters!.title}</span>
-                    <span className="text-sm text-navy-700">
+                    <span className="block truncate font-semibold text-ink">{share.matters!.title}</span>
+                    <span className="text-sm text-ink-muted">
                       {sharePermissionLabels[share.permission]}
                       {share.expires_at ? ` · Hasta el ${formatInZone(share.expires_at, "d MMM yyyy")}` : ""}
                     </span>
                   </span>
-                  <ChevronRight className="size-4.5 text-navy-700/50" aria-hidden="true" />
+                  <ChevronRight className="size-4.5 text-ink-muted/50" aria-hidden="true" />
                 </Link>
               </li>
             ))}
@@ -151,7 +151,7 @@ export default async function PanelHomePage() {
         description={formatInZone(now, "EEEE d 'de' MMMM 'de' yyyy")}
         actions={
           <>
-            <Link href="/panel/agenda/nuevo" className={buttonClasses("ghost", "md", "border border-navy-900/15")}>
+            <Link href="/panel/agenda/nuevo" className={buttonClasses("ghost", "md", "border border-ink/15")}>
               <CalendarPlus aria-hidden="true" />
               Agendar
             </Link>
@@ -171,22 +171,22 @@ export default async function PanelHomePage() {
       </div>
 
       {overdue.data && overdue.data.length > 0 ? (
-        <Card className="mt-5 border-red-200 bg-red-50/40">
-          <div className="flex items-center gap-2 border-b border-red-200 px-5 py-3 text-red-800">
+        <Card className="mt-5 border-danger-ink/30 bg-danger-soft/40">
+          <div className="flex items-center gap-2 border-b border-danger-ink/30 px-5 py-3 text-danger-ink">
             <TriangleAlert className="size-5" aria-hidden="true" />
             <h2 className="font-semibold">Pendientes con fecha vencida</h2>
           </div>
-          <ul className="divide-y divide-red-100">
+          <ul className="divide-y divide-danger-ink/15">
             {overdue.data.map((event) => (
               <li key={event.id}>
-                <Link href={`/panel/agenda/${event.id}`} className="flex items-center gap-3 px-5 py-3 hover:bg-red-50">
+                <Link href={`/panel/agenda/${event.id}`} className="flex items-center gap-3 px-5 py-3 hover:bg-danger-soft">
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-medium text-navy-900">{event.title}</span>
-                    <span className="text-sm text-red-800">
+                    <span className="block truncate font-medium text-ink">{event.title}</span>
+                    <span className="text-sm text-danger-ink">
                       {eventKindLabels[event.kind]} · {formatInZone(event.starts_at, "d MMM")} ({relativeDayLabel(event.starts_at)})
                     </span>
                   </span>
-                  <ChevronRight className="size-4.5 text-navy-700/50" aria-hidden="true" />
+                  <ChevronRight className="size-4.5 text-ink-muted/50" aria-hidden="true" />
                 </Link>
               </li>
             ))}
@@ -199,27 +199,27 @@ export default async function PanelHomePage() {
           <CardHeader
             title="Próximos 14 días"
             action={
-              <Link href="/panel/agenda" className="text-sm font-medium text-gold-700 hover:underline">
+              <Link href="/panel/agenda" className="text-sm font-medium text-accent-ink hover:underline">
                 Ver agenda
               </Link>
             }
           />
           {upcoming.data && upcoming.data.length > 0 ? (
-            <ul className="divide-y divide-navy-900/8">
+            <ul className="divide-y divide-ink/8">
               {upcoming.data.map((event) => (
                 <li key={event.id}>
-                  <Link href={`/panel/agenda/${event.id}`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50">
+                  <Link href={`/panel/agenda/${event.id}`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-canvas">
                     <span className="w-14 shrink-0 text-center">
-                      <span className="block text-xs font-semibold text-gold-700 uppercase">{formatInZone(event.starts_at, "MMM")}</span>
-                      <span className="block font-serif text-2xl leading-none text-navy-900">{formatInZone(event.starts_at, "d")}</span>
+                      <span className="block text-xs font-semibold text-accent-ink uppercase">{formatInZone(event.starts_at, "MMM")}</span>
+                      <span className="block font-serif text-2xl leading-none text-ink">{formatInZone(event.starts_at, "d")}</span>
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex flex-wrap items-center gap-2">
-                        <span className="truncate font-medium text-navy-900">{event.title}</span>
+                        <span className="truncate font-medium text-ink">{event.title}</span>
                         <Badge tone={eventKindTones[event.kind]}>{eventKindLabels[event.kind]}</Badge>
                         {event.priority === "critica" ? <Badge tone="red">Crítico</Badge> : null}
                       </span>
-                      <span className="block truncate text-sm text-navy-700">
+                      <span className="block truncate text-sm text-ink-muted">
                         {relativeDayLabel(event.starts_at)}
                         {event.all_day ? "" : ` · ${formatInZone(event.starts_at, "HH:mm")} h`}
                         {event.matters ? ` · ${event.matters.title}` : ""}
@@ -237,12 +237,12 @@ export default async function PanelHomePage() {
         <Card>
           <CardHeader title="Últimas actuaciones" />
           {latestEntries.data && latestEntries.data.length > 0 ? (
-            <ul className="divide-y divide-navy-900/8">
+            <ul className="divide-y divide-ink/8">
               {latestEntries.data.map((entry) => (
                 <li key={entry.id}>
-                  <Link href={`/panel/expedientes/${entry.matters?.id ?? ""}`} className="block px-5 py-3.5 hover:bg-slate-50">
-                    <span className="block truncate font-medium text-navy-900">{entry.summary}</span>
-                    <span className="block truncate text-sm text-navy-700">
+                  <Link href={`/panel/expedientes/${entry.matters?.id ?? ""}`} className="block px-5 py-3.5 hover:bg-canvas">
+                    <span className="block truncate font-medium text-ink">{entry.summary}</span>
+                    <span className="block truncate text-sm text-ink-muted">
                       {entryKindLabels[entry.kind]} · {formatDateOnly(entry.occurred_on, "d MMM")}
                       {entry.matters ? ` · ${entry.matters.title}` : ""}
                     </span>

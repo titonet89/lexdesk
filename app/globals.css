@@ -15,6 +15,27 @@
   --color-gold-700: #86621f;
   --color-gold-50: #fbf5e9;
 
+  /*
+   * Colores semánticos del panel (claro/oscuro). Los valores reales viven en
+   * variables --lx-* que cambian según [data-theme]; el sitio público siempre
+   * usa los valores claros.
+   */
+  --color-surface: var(--lx-surface);
+  --color-canvas: var(--lx-canvas);
+  --color-ink: var(--lx-ink);
+  --color-ink-soft: var(--lx-ink-soft);
+  --color-ink-muted: var(--lx-ink-muted);
+  --color-accent-ink: var(--lx-accent-ink);
+  --color-accent-soft: var(--lx-accent-soft);
+  --color-danger-ink: var(--lx-danger-ink);
+  --color-danger-soft: var(--lx-danger-soft);
+  --color-success-ink: var(--lx-success-ink);
+  --color-success-soft: var(--lx-success-soft);
+  --color-warning-ink: var(--lx-warning-ink);
+  --color-warning-soft: var(--lx-warning-soft);
+  --color-info-ink: var(--lx-info-ink);
+  --color-info-soft: var(--lx-info-soft);
+
   --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
@@ -37,6 +58,71 @@
   }
 }
 
+/* Modo oscuro por atributo: dark: aplica dentro de [data-theme="dark"]. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root,
+[data-theme="light"] {
+  --lx-surface: #ffffff;
+  --lx-canvas: #faf7f2;
+  --lx-ink: #0f172a;
+  --lx-ink-soft: #1e293b;
+  --lx-ink-muted: #334155;
+  --lx-accent-ink: #86621f;
+  --lx-accent-soft: #fbf5e9;
+  --lx-danger-ink: #991b1b;
+  --lx-danger-soft: #fef2f2;
+  --lx-success-ink: #065f46;
+  --lx-success-soft: #ecfdf5;
+  --lx-warning-ink: #92400e;
+  --lx-warning-soft: #fffbeb;
+  --lx-info-ink: #075985;
+  --lx-info-soft: #f0f9ff;
+  color-scheme: light;
+}
+
+/* Contrastes verificados para AA sobre --lx-surface y --lx-canvas oscuros. */
+[data-theme="dark"] {
+  --lx-surface: #131c2e;
+  --lx-canvas: #0b1220;
+  --lx-ink: #e7ecf3;
+  --lx-ink-soft: #cdd5e0;
+  --lx-ink-muted: #9aa6b8;
+  --lx-accent-ink: #dcb877;
+  --lx-accent-soft: rgb(184 137 47 / 0.16);
+  --lx-danger-ink: #fca5a5;
+  --lx-danger-soft: rgb(239 68 68 / 0.14);
+  --lx-success-ink: #6ee7b7;
+  --lx-success-soft: rgb(16 185 129 / 0.14);
+  --lx-warning-ink: #fcd34d;
+  --lx-warning-soft: rgb(245 158 11 / 0.14);
+  --lx-info-ink: #7dd3fc;
+  --lx-info-soft: rgb(14 165 233 / 0.14);
+  color-scheme: dark;
+}
+
+/* "Según el sistema": sigue la preferencia del dispositivo. */
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    --lx-surface: #131c2e;
+    --lx-canvas: #0b1220;
+    --lx-ink: #e7ecf3;
+    --lx-ink-soft: #cdd5e0;
+    --lx-ink-muted: #9aa6b8;
+    --lx-accent-ink: #dcb877;
+    --lx-accent-soft: rgb(184 137 47 / 0.16);
+    --lx-danger-ink: #fca5a5;
+    --lx-danger-soft: rgb(239 68 68 / 0.14);
+    --lx-success-ink: #6ee7b7;
+    --lx-success-soft: rgb(16 185 129 / 0.14);
+    --lx-warning-ink: #fcd34d;
+    --lx-warning-soft: rgb(245 158 11 / 0.14);
+    --lx-info-ink: #7dd3fc;
+    --lx-info-soft: rgb(14 165 233 / 0.14);
+    color-scheme: dark;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
@@ -44,8 +130,8 @@ html {
 }
 
 body {
-  background: var(--color-slate-50);
-  color: var(--color-navy-900);
+  background: var(--lx-canvas);
+  color: var(--lx-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

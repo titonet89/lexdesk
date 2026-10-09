@@ -38,7 +38,7 @@ export function DocumentDownloadButton({ documentId, name }: { documentId: strin
   return (
     <span className="inline-flex items-center gap-2">
       {error ? (
-        <span role="alert" className="text-xs text-red-700">
+        <span role="alert" className="text-xs text-danger-ink">
           {error}
         </span>
       ) : null}
@@ -46,7 +46,7 @@ export function DocumentDownloadButton({ documentId, name }: { documentId: strin
         type="button"
         onClick={handleClick}
         disabled={pending}
-        className="grid size-9 place-items-center rounded-lg text-navy-700 transition-colors hover:bg-navy-900/5 hover:text-navy-900"
+        className="grid size-9 place-items-center rounded-lg text-ink-muted transition-colors hover:bg-ink/5 hover:text-ink"
         aria-label={`Descargar ${name}`}
       >
         {pending ? <LoaderCircle className="size-4.5 animate-spin" aria-hidden="true" /> : <Download className="size-4.5" aria-hidden="true" />}

@@ -15,12 +15,12 @@ export default async function EnrollPage() {
 
   return (
     <>
-      <h1 className="font-serif text-3xl tracking-tight text-navy-900">Activá la verificación en dos pasos</h1>
-      <p className="mt-1.5 text-navy-700">
+      <h1 className="font-serif text-3xl tracking-tight text-ink">Activá la verificación en dos pasos</h1>
+      <p className="mt-1.5 text-ink-muted">
         Es obligatoria para proteger la información de tus clientes. Lleva un minuto.
       </p>
       <EnrollTotpForm />
-      <div className="mt-6 border-t border-navy-900/8 pt-4 text-center">
+      <div className="mt-6 border-t border-ink/8 pt-4 text-center">
         <SignOutButton variant="link" />
       </div>
     </>

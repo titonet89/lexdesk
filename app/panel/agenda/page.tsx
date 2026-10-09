@@ -94,7 +94,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Link href={query({ tipo: undefined })} className={cn("rounded-full px-3 py-1.5 text-sm font-medium", !kind ? "bg-navy-900 text-white" : "bg-white text-navy-800 ring-1 ring-navy-900/10")}>
+        <Link href={query({ tipo: undefined })} className={cn("rounded-full px-3 py-1.5 text-sm font-medium", !kind ? "bg-ink text-surface" : "bg-surface text-ink-soft ring-1 ring-ink/10")}>
           Todos
         </Link>
         {toOptions(eventKindLabels).map((option) => (
@@ -103,37 +103,37 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
             href={query({ tipo: option.value })}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium",
-              kind === option.value ? "bg-navy-900 text-white" : "bg-white text-navy-800 ring-1 ring-navy-900/10",
+              kind === option.value ? "bg-ink text-surface" : "bg-surface text-ink-soft ring-1 ring-ink/10",
             )}
           >
             <span className={cn("size-2 rounded-full", eventKindDot[option.value])} aria-hidden="true" />
             {option.label}
           </Link>
         ))}
-        <Link href={query({ cumplidos: showDone ? undefined : "1" })} className="ml-auto text-sm font-medium text-gold-700 hover:underline">
+        <Link href={query({ cumplidos: showDone ? undefined : "1" })} className="ml-auto text-sm font-medium text-accent-ink hover:underline">
           {showDone ? "Ocultar cumplidos y cancelados" : "Mostrar cumplidos y cancelados"}
         </Link>
       </div>
 
       <Card className="overflow-hidden">
-        <div className="flex items-center justify-between border-b border-navy-900/8 px-4 py-3 sm:px-5">
-          <Link href={query({ mes: format(subMonths(monthDate, 1), "yyyy-MM") })} className="grid size-10 place-items-center rounded-lg hover:bg-navy-900/5" aria-label="Mes anterior">
+        <div className="flex items-center justify-between border-b border-ink/8 px-4 py-3 sm:px-5">
+          <Link href={query({ mes: format(subMonths(monthDate, 1), "yyyy-MM") })} className="grid size-10 place-items-center rounded-lg hover:bg-ink/5" aria-label="Mes anterior">
             <ChevronLeft className="size-5" aria-hidden="true" />
           </Link>
           <div className="text-center">
-            <h2 className="font-serif text-xl text-navy-900 capitalize">{format(monthDate, "MMMM yyyy", { locale: es })}</h2>
+            <h2 className="font-serif text-xl text-ink capitalize">{format(monthDate, "MMMM yyyy", { locale: es })}</h2>
             {monthParam !== today.slice(0, 7) ? (
-              <Link href={query({ mes: today.slice(0, 7) })} className="text-xs font-medium text-gold-700 hover:underline">
+              <Link href={query({ mes: today.slice(0, 7) })} className="text-xs font-medium text-accent-ink hover:underline">
                 Ir a hoy
               </Link>
             ) : null}
           </div>
-          <Link href={query({ mes: format(addMonths(monthDate, 1), "yyyy-MM") })} className="grid size-10 place-items-center rounded-lg hover:bg-navy-900/5" aria-label="Mes siguiente">
+          <Link href={query({ mes: format(addMonths(monthDate, 1), "yyyy-MM") })} className="grid size-10 place-items-center rounded-lg hover:bg-ink/5" aria-label="Mes siguiente">
             <ChevronRight className="size-5" aria-hidden="true" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-7 border-b border-navy-900/8 bg-slate-50 text-center text-xs font-semibold text-navy-700">
+        <div className="grid grid-cols-7 border-b border-ink/8 bg-canvas text-center text-xs font-semibold text-ink-muted">
           {WEEKDAYS.map((day) => (
             <div key={day} className="py-2">
               {day}
@@ -153,9 +153,9 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
               <div
                 key={key}
                 className={cn(
-                  "min-h-16 border-r border-b border-navy-900/6 p-1 sm:min-h-28 sm:p-1.5 [&:nth-child(7n)]:border-r-0",
-                  outside && "bg-slate-50/70",
-                  (weekend || holiday) && !outside && "bg-navy-900/[0.025]",
+                  "min-h-16 border-r border-b border-ink/6 p-1 sm:min-h-28 sm:p-1.5 [&:nth-child(7n)]:border-r-0",
+                  outside && "bg-canvas/70",
+                  (weekend || holiday) && !outside && "bg-ink/[0.025]",
                 )}
               >
                 <Link
@@ -165,17 +165,17 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
                     isToday
                       ? "bg-gold-600 text-navy-950"
                       : outside
-                        ? "text-navy-700/40"
+                        ? "text-ink-muted/40"
                         : holiday
-                          ? "text-red-700 hover:bg-red-50"
-                          : "text-navy-800 hover:bg-navy-900/5",
+                          ? "text-danger-ink hover:bg-danger-soft"
+                          : "text-ink-soft hover:bg-ink/5",
                   )}
                   aria-label={`Agendar el ${format(day, "d 'de' MMMM", { locale: es })}${holiday ? ` (inhábil: ${holiday})` : ""}`}
                 >
                   {format(day, "d")}
                 </Link>
                 {holiday ? (
-                  <p className="mt-0.5 hidden truncate px-1 text-[10px] font-medium text-red-700 sm:block" title={holiday}>
+                  <p className="mt-0.5 hidden truncate px-1 text-[10px] font-medium text-danger-ink sm:block" title={holiday}>
                     {holiday}
                   </p>
                 ) : null}
@@ -192,9 +192,9 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
                       <Link
                         href={`/panel/agenda/${event.id}`}
                         className={cn(
-                          "flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[11px] leading-tight text-navy-900 hover:bg-navy-900/5",
-                          event.status !== "pendiente" && "text-navy-700/60 line-through",
-                          event.priority === "critica" && "bg-red-50 font-semibold",
+                          "flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[11px] leading-tight text-ink hover:bg-ink/5",
+                          event.status !== "pendiente" && "text-ink-muted/60 line-through",
+                          event.priority === "critica" && "bg-danger-soft font-semibold",
                         )}
                         title={event.title}
                       >
@@ -204,7 +204,7 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
                       </Link>
                     </li>
                   ))}
-                  {dayEvents.length > 3 ? <li className="px-1.5 text-[11px] text-navy-700">+{dayEvents.length - 3} más</li> : null}
+                  {dayEvents.length > 3 ? <li className="px-1.5 text-[11px] text-ink-muted">+{dayEvents.length - 3} más</li> : null}
                 </ul>
               </div>
             );
@@ -215,23 +215,23 @@ export default async function AgendaPage({ searchParams }: PageProps<"/panel/age
       <Card className="mt-5">
         <CardHeader title={`Eventos de ${format(monthDate, "MMMM", { locale: es })}`} description={`${monthEvents.length} en total`} />
         {monthEvents.length > 0 ? (
-          <ul className="divide-y divide-navy-900/8" data-testid="month-events">
+          <ul className="divide-y divide-ink/8" data-testid="month-events">
             {monthEvents.map((event) => (
               <li key={event.id}>
-                <Link href={`/panel/agenda/${event.id}`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50">
+                <Link href={`/panel/agenda/${event.id}`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-canvas">
                   <span className="w-12 shrink-0 text-center">
-                    <span className="block text-[11px] font-semibold text-gold-700 uppercase">{formatInZone(event.starts_at, "EEE")}</span>
-                    <span className="block font-serif text-2xl leading-none text-navy-900">{formatInZone(event.starts_at, "d")}</span>
+                    <span className="block text-[11px] font-semibold text-accent-ink uppercase">{formatInZone(event.starts_at, "EEE")}</span>
+                    <span className="block font-serif text-2xl leading-none text-ink">{formatInZone(event.starts_at, "d")}</span>
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-2">
-                      <span className={cn("font-medium text-navy-900", event.status !== "pendiente" && "text-navy-700 line-through")}>
+                      <span className={cn("font-medium text-ink", event.status !== "pendiente" && "text-ink-muted line-through")}>
                         {event.title}
                       </span>
                       <Badge tone={eventKindTones[event.kind]}>{eventKindLabels[event.kind]}</Badge>
                       {event.priority === "critica" ? <Badge tone="red">Crítico</Badge> : null}
                     </span>
-                    <span className="block truncate text-sm text-navy-700">
+                    <span className="block truncate text-sm text-ink-muted">
                       {event.all_day ? "Todo el día" : `${formatInZone(event.starts_at, "HH:mm")} h`}
                       {event.matters ? ` · ${event.matters.title}` : ""}
                       {event.location ? ` · ${event.location}` : ""}

@@ -15,7 +15,7 @@ export default async function NewClientPage() {
       <PageHeader
         title="Nuevo cliente"
         eyebrow={
-          <Link href="/panel/clientes" className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href="/panel/clientes" className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             Clientes
           </Link>

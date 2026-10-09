@@ -95,7 +95,7 @@ export function ClientForm({ action, client, cancelHref }: ClientFormProps) {
           <Textarea id="notes" name="notes" rows={4} defaultValue={client?.notes ?? ""} aria-invalid={invalid("notes")} />
         </Field>
 
-        <div className="flex flex-col-reverse gap-2 border-t border-navy-900/8 pt-5 sm:flex-row sm:justify-end">
+        <div className="flex flex-col-reverse gap-2 border-t border-ink/8 pt-5 sm:flex-row sm:justify-end">
           <Link href={cancelHref} className={buttonClasses("ghost", "md")}>
             Cancelar
           </Link>

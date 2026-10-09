@@ -105,6 +105,8 @@ test("la titular da de alta y edita un cliente", async ({ page }) => {
 
   await expect(page.getByRole("heading", { level: 1, name: "María Quispe" })).toBeVisible();
   await expect(page.getByText("DNI 30111222")).toBeVisible();
+  // "388 412 3456" se normaliza al formato internacional de WhatsApp.
+  await expect(page.getByTestId("client-whatsapp")).toHaveAttribute("href", /^https:\/\/wa\.me\/5493884123456\?text=Hola%20Mar%C3%ADa/);
 
   await page.getByRole("link", { name: "Editar" }).click();
   await page.getByLabel("Email").fill("maria@example.com");
@@ -159,6 +161,45 @@ test.describe("gestión del estudio", () => {
     await page.getByLabel("Resumen").fill("Se inició la sucesión");
     await page.getByRole("button", { name: "Registrar actuación" }).click();
     await expect(page.getByTestId("entries-list")).toContainText("Se inició la sucesión");
+  });
+
+  test("la paleta de comandos busca y navega con el teclado", async () => {
+    const page = titularPage;
+    await page.goto("/panel");
+    await page.keyboard.press("Control+K");
+    const input = page.getByPlaceholder("Buscar expedientes, clientes o acciones…");
+    await expect(input).toBeFocused();
+
+    await input.fill(RUN);
+    const list = page.getByTestId("command-list");
+    await expect(list.getByRole("option", { name: new RegExp(MATTER.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")) })).toBeVisible();
+    await expect(list.getByRole("option", { name: CLIENT, exact: true })).toBeVisible();
+
+    // Enter abre el primer resultado (el expediente).
+    await page.keyboard.press("Enter");
+    await page.waitForURL((url) => url.pathname === matterUrl);
+
+    // Acciones rápidas: "nuevo cliente" en dos teclas.
+    await page.keyboard.press("Control+K");
+    await page.getByPlaceholder("Buscar expedientes, clientes o acciones…").fill("nuevo cliente");
+    await page.keyboard.press("Enter");
+    await page.waitForURL(/\/panel\/clientes\/nuevo$/);
+  });
+
+  test("el modo oscuro se aplica y se recuerda", async () => {
+    const page = titularPage;
+    await page.goto("/panel");
+    await page.locator("aside").getByRole("button", { name: "Tema oscuro" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    const darkCanvas = await page.locator("#panel-contenido").evaluate((el) => getComputedStyle(el.parentElement!).backgroundColor);
+    expect(darkCanvas).toBe("rgb(11, 18, 32)");
+
+    await page.reload();
+    await expect(page.locator("[data-theme='dark']").first()).toBeVisible();
+    await expect(page.locator("aside").getByRole("button", { name: "Tema oscuro" })).toHaveAttribute("aria-pressed", "true");
+
+    await page.locator("aside").getByRole("button", { name: "Tema claro" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   });
 
   test("sube un documento, lo descarga y queda auditado", async () => {

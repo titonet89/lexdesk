@@ -31,13 +31,13 @@ export default async function EventDetailPage({ params }: PageProps<"/panel/agen
       <PageHeader
         title={event.title}
         eyebrow={
-          <Link href="/panel/agenda" className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href="/panel/agenda" className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             Agenda
           </Link>
         }
         actions={
-          <Link href={`/panel/agenda/${id}/editar`} className={buttonClasses("ghost", "md", "border border-navy-900/15")}>
+          <Link href={`/panel/agenda/${id}/editar`} className={buttonClasses("ghost", "md", "border border-ink/15")}>
             <Pencil aria-hidden="true" />
             Editar
           </Link>
@@ -57,13 +57,13 @@ export default async function EventDetailPage({ params }: PageProps<"/panel/agen
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card className="space-y-4 p-5 sm:p-6">
-          <p className="flex items-start gap-3 text-navy-900">
-            <Clock className="mt-0.5 size-5 shrink-0 text-gold-700" aria-hidden="true" />
+          <p className="flex items-start gap-3 text-ink">
+            <Clock className="mt-0.5 size-5 shrink-0 text-accent-ink" aria-hidden="true" />
             <span>
               <span className="block font-semibold capitalize">
                 {formatInZone(event.starts_at, "EEEE d 'de' MMMM 'de' yyyy")}
               </span>
-              <span className="text-sm text-navy-700">
+              <span className="text-sm text-ink-muted">
                 {event.all_day
                   ? "Todo el día"
                   : `${formatInZone(event.starts_at, "HH:mm")}${event.ends_at ? ` a ${formatInZone(event.ends_at, "HH:mm")}` : ""} h`}{" "}
@@ -72,30 +72,30 @@ export default async function EventDetailPage({ params }: PageProps<"/panel/agen
             </span>
           </p>
           {event.location ? (
-            <p className="flex items-start gap-3 text-navy-900">
-              <MapPin className="mt-0.5 size-5 shrink-0 text-gold-700" aria-hidden="true" />
+            <p className="flex items-start gap-3 text-ink">
+              <MapPin className="mt-0.5 size-5 shrink-0 text-accent-ink" aria-hidden="true" />
               {event.location}
             </p>
           ) : null}
           {event.matters ? (
             <p className="flex items-start gap-3">
-              <FolderOpen className="mt-0.5 size-5 shrink-0 text-gold-700" aria-hidden="true" />
-              <Link href={`/panel/expedientes/${event.matters.id}`} className="font-medium text-gold-700 hover:underline">
+              <FolderOpen className="mt-0.5 size-5 shrink-0 text-accent-ink" aria-hidden="true" />
+              <Link href={`/panel/expedientes/${event.matters.id}`} className="font-medium text-accent-ink hover:underline">
                 {event.matters.title}
               </Link>
             </p>
           ) : null}
           {event.deadline_from && event.deadline_business_days ? (
-            <p className="flex items-start gap-3 text-sm text-navy-800">
-              <Calculator className="mt-0.5 size-5 shrink-0 text-gold-700" aria-hidden="true" />
+            <p className="flex items-start gap-3 text-sm text-ink-soft">
+              <Calculator className="mt-0.5 size-5 shrink-0 text-accent-ink" aria-hidden="true" />
               Plazo de {event.deadline_business_days} días hábiles desde la notificación del{" "}
               {formatDateOnly(event.deadline_from, "d 'de' MMMM 'de' yyyy")}.
             </p>
           ) : null}
           {event.notes ? (
-            <div className="border-t border-navy-900/8 pt-4">
-              <p className="text-xs font-semibold tracking-wide text-navy-700/70 uppercase">Notas</p>
-              <p className="mt-1 whitespace-pre-line text-navy-800">{event.notes}</p>
+            <div className="border-t border-ink/8 pt-4">
+              <p className="text-xs font-semibold tracking-wide text-ink-muted/70 uppercase">Notas</p>
+              <p className="mt-1 whitespace-pre-line text-ink-soft">{event.notes}</p>
             </div>
           ) : null}
         </Card>
@@ -110,7 +110,7 @@ export default async function EventDetailPage({ params }: PageProps<"/panel/agen
                 </button>
               </form>
               <form action={setEventStatusAction.bind(null, id, "cancelado")}>
-                <button type="submit" className={buttonClasses("ghost", "md", "w-full border border-navy-900/15")}>
+                <button type="submit" className={buttonClasses("ghost", "md", "w-full border border-ink/15")}>
                   <Ban aria-hidden="true" />
                   Cancelar evento
                 </button>
@@ -118,13 +118,13 @@ export default async function EventDetailPage({ params }: PageProps<"/panel/agen
             </>
           ) : (
             <form action={setEventStatusAction.bind(null, id, "pendiente")}>
-              <button type="submit" className={buttonClasses("ghost", "md", "w-full border border-navy-900/15")}>
+              <button type="submit" className={buttonClasses("ghost", "md", "w-full border border-ink/15")}>
                 <RotateCcw aria-hidden="true" />
                 Volver a pendiente
               </button>
             </form>
           )}
-          <div className="border-t border-navy-900/8 pt-3 text-center">
+          <div className="border-t border-ink/8 pt-3 text-center">
             <ConfirmActionButton
               action={deleteEventAction.bind(null, id)}
               title="¿Eliminar este evento?"

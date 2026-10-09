@@ -125,16 +125,16 @@ export function MatterForm({ action, clients, matter, defaultClientId, today, ca
           <Textarea id="description" name="description" rows={5} defaultValue={matter?.description ?? ""} />
         </Field>
 
-        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-navy-900/10 bg-slate-50 p-4">
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-ink/10 bg-canvas p-4">
           <input
             type="checkbox"
             name="is_sensitive"
             defaultChecked={matter?.is_sensitive ?? false}
             className="mt-0.5 size-5 shrink-0 accent-gold-600"
           />
-          <span className="text-sm text-navy-800">
-            <span className="flex items-center gap-1.5 font-semibold text-navy-900">
-              <ShieldAlert className="size-4 text-gold-700" aria-hidden="true" />
+          <span className="text-sm text-ink-soft">
+            <span className="flex items-center gap-1.5 font-semibold text-ink">
+              <ShieldAlert className="size-4 text-accent-ink" aria-hidden="true" />
               Expediente sensible
             </span>
             No se puede compartir con colaboradores. Recomendado para violencia de género o información de
@@ -142,7 +142,7 @@ export function MatterForm({ action, clients, matter, defaultClientId, today, ca
           </span>
         </label>
 
-        <div className="flex flex-col-reverse gap-2 border-t border-navy-900/8 pt-5 sm:flex-row sm:justify-end">
+        <div className="flex flex-col-reverse gap-2 border-t border-ink/8 pt-5 sm:flex-row sm:justify-end">
           <Link href={cancelHref} className={buttonClasses("ghost", "md")}>
             Cancelar
           </Link>

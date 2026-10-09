@@ -105,9 +105,9 @@ export function EventForm({ action, defaults, matters, nonWorkingDays, cancelHre
         </Field>
 
         {showCalculator ? (
-          <div className="rounded-2xl border border-gold-600/25 bg-gold-50/60 p-4 sm:p-5" data-testid="deadline-calculator">
-            <p className="flex items-center gap-2 font-semibold text-navy-900">
-              <Calculator className="size-4.5 text-gold-700" aria-hidden="true" />
+          <div className="rounded-2xl border border-gold-600/25 bg-accent-soft/60 p-4 sm:p-5" data-testid="deadline-calculator">
+            <p className="flex items-center gap-2 font-semibold text-ink">
+              <Calculator className="size-4.5 text-accent-ink" aria-hidden="true" />
               Calcular plazo en días hábiles
             </p>
             <div className="mt-3 grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
@@ -142,12 +142,12 @@ export function EventForm({ action, defaults, matters, nonWorkingDays, cancelHre
               </button>
             </div>
             {calculation ? (
-              <div className="mt-3 space-y-1 text-sm text-navy-800" aria-live="polite">
+              <div className="mt-3 space-y-1 text-sm text-ink-soft" aria-live="polite">
                 <p>
                   Vence el <strong data-testid="deadline-result">{formatDateOnly(calculation.dueDate, "EEEE d 'de' MMMM 'de' yyyy")}</strong>.
                 </p>
                 {calculation.skipped.length > 0 ? (
-                  <p className="text-navy-700">
+                  <p className="text-ink-muted">
                     Se saltearon:{" "}
                     {calculation.skipped
                       .map((day) => `${formatDateOnly(day, "d/M")} (${descriptions.get(day) ?? "inhábil"})`)
@@ -155,7 +155,7 @@ export function EventForm({ action, defaults, matters, nonWorkingDays, cancelHre
                     .
                   </p>
                 ) : null}
-                <p className="flex items-start gap-1.5 text-xs text-navy-700/80">
+                <p className="flex items-start gap-1.5 text-xs text-ink-muted/80">
                   <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
                   Cuenta desde el día hábil siguiente a la notificación. Verificá el plazo de gracia y los días
                   inhábiles cargados en Ajustes → Feriados.
@@ -169,7 +169,7 @@ export function EventForm({ action, defaults, matters, nonWorkingDays, cancelHre
           <Field label="Fecha" htmlFor="date" error={errors.date} required>
             <Input id="date" name="date" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
           </Field>
-          <label className="flex h-11 cursor-pointer items-center gap-2 text-sm text-navy-800">
+          <label className="flex h-11 cursor-pointer items-center gap-2 text-sm text-ink-soft">
             <input
               type="checkbox"
               name="all_day"
@@ -195,7 +195,7 @@ export function EventForm({ action, defaults, matters, nonWorkingDays, cancelHre
           <Textarea id="notes" name="notes" rows={3} defaultValue={defaults.notes} />
         </Field>
 
-        <div className="flex flex-col-reverse gap-2 border-t border-navy-900/8 pt-5 sm:flex-row sm:justify-end">
+        <div className="flex flex-col-reverse gap-2 border-t border-ink/8 pt-5 sm:flex-row sm:justify-end">
           <Link href={cancelHref} className={buttonClasses("ghost", "md")}>
             Cancelar
           </Link>

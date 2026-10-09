@@ -24,7 +24,7 @@ export default async function SecurityPage() {
         title="Seguridad de la cuenta"
         eyebrow={
           active.role === "titular" ? (
-            <Link href="/panel/ajustes" className="inline-flex items-center gap-1 hover:text-navy-900">
+            <Link href="/panel/ajustes" className="inline-flex items-center gap-1 hover:text-ink">
               <ArrowLeft className="size-4" aria-hidden="true" />
               Ajustes
             </Link>
@@ -45,16 +45,16 @@ export default async function SecurityPage() {
             <CardHeader title="Verificación en dos pasos" />
             <div className="space-y-3 p-5 text-sm">
               {verifiedFactors.map((factor) => (
-                <p key={factor.id} className="flex items-center gap-3 text-navy-800">
-                  <ShieldCheck className="size-5 text-emerald-700" aria-hidden="true" />
+                <p key={factor.id} className="flex items-center gap-3 text-ink-soft">
+                  <ShieldCheck className="size-5 text-success-ink" aria-hidden="true" />
                   <span className="flex-1">
                     App de autenticación
-                    <span className="block text-xs text-navy-700">Activada el {formatInZone(factor.created_at, "d MMM yyyy")}</span>
+                    <span className="block text-xs text-ink-muted">Activada el {formatInZone(factor.created_at, "d MMM yyyy")}</span>
                   </span>
                   <Badge tone="green">Activa</Badge>
                 </p>
               ))}
-              <p className="text-navy-700">
+              <p className="text-ink-muted">
                 Si perdés el celular, cerrá sesión en todos los dispositivos y pedí al soporte técnico que restablezca
                 tu verificación.
               </p>
@@ -63,7 +63,7 @@ export default async function SecurityPage() {
 
           <Card>
             <CardHeader title="Sesiones" />
-            <div className="p-5 text-sm text-navy-800">
+            <div className="p-5 text-sm text-ink-soft">
               <p>Cierra tu sesión en todos los navegadores y dispositivos donde hayas ingresado.</p>
               <div className="mt-4">
                 <ConfirmActionButton
@@ -71,7 +71,7 @@ export default async function SecurityPage() {
                   title="¿Cerrar sesión en todos lados?"
                   description="Vas a tener que volver a ingresar con tu contraseña y tu código en todos los dispositivos."
                   confirmLabel="Cerrar todas"
-                  className="rounded-full border border-navy-900/15 px-4 py-2"
+                  className="rounded-full border border-ink/15 px-4 py-2"
                 >
                   <LogOut className="size-4" aria-hidden="true" />
                   Cerrar sesión en todos los dispositivos

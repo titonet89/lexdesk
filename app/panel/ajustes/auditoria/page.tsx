@@ -44,7 +44,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/panel/ajus
         title="Auditoría"
         description="Últimos 200 movimientos. Por privacidad se registran los campos modificados, no su contenido."
         eyebrow={
-          <Link href="/panel/ajustes" className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href="/panel/ajustes" className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             Ajustes
           </Link>
@@ -69,7 +69,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/panel/ajus
         {rows && rows.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-sm" data-testid="audit-table">
-              <thead className="border-b border-navy-900/8 bg-slate-50 text-xs font-semibold tracking-wide text-navy-700 uppercase">
+              <thead className="border-b border-ink/8 bg-canvas text-xs font-semibold tracking-wide text-ink-muted uppercase">
                 <tr>
                   <th scope="col" className="px-5 py-3">Fecha</th>
                   <th scope="col" className="px-5 py-3">Usuario</th>
@@ -78,18 +78,18 @@ export default async function AuditPage({ searchParams }: PageProps<"/panel/ajus
                   <th scope="col" className="px-5 py-3">Campos</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-900/8">
+              <tbody className="divide-y divide-ink/8">
                 {rows.map((row) => (
                   <tr key={row.id}>
-                    <td className="px-5 py-3 whitespace-nowrap text-navy-800 tabular-nums">
+                    <td className="px-5 py-3 whitespace-nowrap text-ink-soft tabular-nums">
                       {formatInZone(row.occurred_at, "dd/MM/yyyy HH:mm")}
                     </td>
-                    <td className="px-5 py-3 text-navy-900">{row.actor_id ? (names.get(row.actor_id) ?? "Usuario eliminado") : "Sistema"}</td>
+                    <td className="px-5 py-3 text-ink">{row.actor_id ? (names.get(row.actor_id) ?? "Usuario eliminado") : "Sistema"}</td>
                     <td className="px-5 py-3">
                       <Badge tone={actionTones[row.action] ?? "neutral"}>{auditActionLabels[row.action] ?? row.action}</Badge>
                     </td>
-                    <td className="px-5 py-3 text-navy-800">{auditTableLabels[row.table_name] ?? row.table_name}</td>
-                    <td className="px-5 py-3 text-xs text-navy-700">{row.changed_columns?.join(", ") ?? "—"}</td>
+                    <td className="px-5 py-3 text-ink-soft">{auditTableLabels[row.table_name] ?? row.table_name}</td>
+                    <td className="px-5 py-3 text-xs text-ink-muted">{row.changed_columns?.join(", ") ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>

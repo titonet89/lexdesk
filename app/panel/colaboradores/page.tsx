@@ -53,7 +53,7 @@ export default async function CollaboratorsPage() {
         <Card>
           <CardHeader title="Colegas invitados" description={`${collaborators?.length ?? 0} en total`} />
           {collaborators && collaborators.length > 0 ? (
-            <ul className="divide-y divide-navy-900/8" data-testid="collaborators-list">
+            <ul className="divide-y divide-ink/8" data-testid="collaborators-list">
               {collaborators.map((collaborator) => {
                 const count = activeShares.get(collaborator.id) ?? 0;
                 const name = collaborator.full_name || collaborator.email;
@@ -61,10 +61,10 @@ export default async function CollaboratorsPage() {
                   <li key={collaborator.id} className="flex items-center gap-4 px-5 py-4">
                     <span className="min-w-0 flex-1">
                       <span className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold text-navy-900">{name}</span>
+                        <span className="font-semibold text-ink">{name}</span>
                         {collaborator.is_active ? <Badge tone="green">Activo</Badge> : <Badge tone="neutral">Desactivado</Badge>}
                       </span>
-                      <span className="block truncate text-sm text-navy-700">
+                      <span className="block truncate text-sm text-ink-muted">
                         {collaborator.email} · {count} {count === 1 ? "expediente compartido" : "expedientes compartidos"} · desde{" "}
                         {formatInZone(collaborator.created_at, "MMM yyyy")}
                       </span>
@@ -82,7 +82,7 @@ export default async function CollaboratorsPage() {
                       </ConfirmActionButton>
                     ) : (
                       <form action={setCollaboratorActiveAction.bind(null, collaborator.id, true)}>
-                        <button type="submit" className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-700 hover:text-navy-900">
+                        <button type="submit" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted hover:text-ink">
                           <UserCheck className="size-4.5" aria-hidden="true" />
                           Reactivar
                         </button>
@@ -103,13 +103,13 @@ export default async function CollaboratorsPage() {
 
         <div className="space-y-5">
           <Card className="p-5">
-            <h2 className="font-serif text-lg text-navy-900">Invitar a un colega</h2>
-            <p className="mt-1 mb-4 text-sm text-navy-700">Recibirá un email para crear su contraseña y activar su 2FA.</p>
+            <h2 className="font-serif text-lg text-ink">Invitar a un colega</h2>
+            <p className="mt-1 mb-4 text-sm text-ink-muted">Recibirá un email para crear su contraseña y activar su 2FA.</p>
             <InviteForm />
           </Card>
-          <Card className="p-5 text-sm text-navy-800">
-            <p className="flex items-center gap-2 font-semibold text-navy-900">
-              <ShieldCheck className="size-4.5 text-gold-700" aria-hidden="true" />
+          <Card className="p-5 text-sm text-ink-soft">
+            <p className="flex items-center gap-2 font-semibold text-ink">
+              <ShieldCheck className="size-4.5 text-accent-ink" aria-hidden="true" />
               Qué puede ver un colaborador
             </p>
             <ul className="mt-3 list-disc space-y-1 pl-5">

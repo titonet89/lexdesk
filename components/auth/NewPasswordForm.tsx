@@ -74,7 +74,7 @@ export function NewPasswordForm({ redirectTo = "/panel" }: NewPasswordFormProps)
         {passwordRules.map((rule) => {
           const met = rule.test(password);
           return (
-            <li key={rule.id} className={cn("flex items-center gap-1.5", met ? "text-emerald-700" : "text-navy-700/70")}>
+            <li key={rule.id} className={cn("flex items-center gap-1.5", met ? "text-success-ink" : "text-ink-muted/70")}>
               {met ? <Check className="size-3.5" aria-hidden="true" /> : <X className="size-3.5" aria-hidden="true" />}
               {rule.label}
               <span className="sr-only">{met ? "(cumplido)" : "(pendiente)"}</span>

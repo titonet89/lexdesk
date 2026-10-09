@@ -28,7 +28,7 @@ export default async function NonWorkingDaysPage() {
         title="Feriados y ferias judiciales"
         description="Estos días se saltean al calcular vencimientos en días hábiles."
         eyebrow={
-          <Link href="/panel/ajustes" className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href="/panel/ajustes" className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             Ajustes
           </Link>
@@ -39,13 +39,13 @@ export default async function NonWorkingDaysPage() {
         <Card>
           <CardHeader title={`Días inhábiles desde ${todayIso().slice(0, 4)}`} description={`${days?.length ?? 0} cargados`} />
           {days && days.length > 0 ? (
-            <ul className="divide-y divide-navy-900/8" data-testid="non-working-list">
+            <ul className="divide-y divide-ink/8" data-testid="non-working-list">
               {days.map((day) => (
                 <li key={day.day} className="flex items-center gap-4 px-5 py-3">
-                  <span className="w-28 shrink-0 text-sm font-semibold text-navy-900 capitalize">
+                  <span className="w-28 shrink-0 text-sm font-semibold text-ink capitalize">
                     {formatDateOnly(day.day, "EEE d MMM yyyy")}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-sm text-navy-800">{day.description}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm text-ink-soft">{day.description}</span>
                   <Badge tone={day.kind === "feria_judicial" ? "gold" : "neutral"}>{nonWorkingDayKindLabels[day.kind]}</Badge>
                   <ConfirmActionButton
                     action={deleteNonWorkingDayAction.bind(null, day.day)}
@@ -66,12 +66,12 @@ export default async function NonWorkingDaysPage() {
 
         <div className="space-y-5">
           <Card className="p-5">
-            <h2 className="mb-4 font-serif text-lg text-navy-900">Agregar</h2>
+            <h2 className="mb-4 font-serif text-lg text-ink">Agregar</h2>
             <NonWorkingDayForm />
           </Card>
-          <Card className="p-5 text-sm text-navy-800">
-            <p className="flex items-center gap-2 font-semibold text-navy-900">
-              <Info className="size-4.5 text-gold-700" aria-hidden="true" />
+          <Card className="p-5 text-sm text-ink-soft">
+            <p className="flex items-center gap-2 font-semibold text-ink">
+              <Info className="size-4.5 text-accent-ink" aria-hidden="true" />
               Fuentes oficiales
             </p>
             <p className="mt-2">

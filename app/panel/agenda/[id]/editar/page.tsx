@@ -38,7 +38,7 @@ export default async function EditEventPage({ params }: PageProps<"/panel/agenda
       <PageHeader
         title="Editar evento"
         eyebrow={
-          <Link href={`/panel/agenda/${id}`} className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href={`/panel/agenda/${id}`} className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             {event.title}
           </Link>

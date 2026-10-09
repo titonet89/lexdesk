@@ -37,16 +37,16 @@ export default async function SettingsPage() {
           <li key={href}>
             <Link
               href={href}
-              className="group flex h-full flex-col rounded-2xl border border-navy-900/8 bg-white p-5 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-20px_rgb(15_23_42/0.3)]"
+              className="group flex h-full flex-col rounded-2xl border border-ink/8 bg-surface p-5 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-20px_rgb(15_23_42/0.3)]"
             >
-              <span className="grid size-10 place-items-center rounded-xl bg-gold-50 text-gold-700">
+              <span className="grid size-10 place-items-center rounded-xl bg-accent-soft text-accent-ink">
                 <Icon className="size-5" aria-hidden="true" />
               </span>
-              <span className="mt-4 flex items-center justify-between font-serif text-lg text-navy-900">
+              <span className="mt-4 flex items-center justify-between font-serif text-lg text-ink">
                 {title}
-                <ChevronRight className="size-4.5 text-navy-700/50 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <ChevronRight className="size-4.5 text-ink-muted/50 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </span>
-              <span className="mt-1 text-sm text-navy-700">{description}</span>
+              <span className="mt-1 text-sm text-ink-muted">{description}</span>
             </Link>
           </li>
         ))}

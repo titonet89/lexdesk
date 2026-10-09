@@ -29,7 +29,7 @@ export default async function EditMatterPage({ params }: PageProps<"/panel/exped
       <PageHeader
         title="Editar expediente"
         eyebrow={
-          <Link href={`/panel/expedientes/${id}`} className="inline-flex items-center gap-1 hover:text-navy-900">
+          <Link href={`/panel/expedientes/${id}`} className="inline-flex items-center gap-1 hover:text-ink">
             <ArrowLeft className="size-4" aria-hidden="true" />
             {matter.title}
           </Link>

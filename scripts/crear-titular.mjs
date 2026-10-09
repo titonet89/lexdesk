@@ -13,7 +13,10 @@ import { randomBytes } from "node:crypto";
 import { parseArgs } from "node:util";
 import { createClient } from "@supabase/supabase-js";
 
-const { values } = parseArgs({
+// Acepta --email/--nombre/--estudio o, en ese mismo orden, argumentos sueltos:
+// en PowerShell, `npm run ... -- --email x` pierde los nombres de las opciones.
+const { values, positionals } = parseArgs({
+  allowPositionals: true,
   options: {
     email: { type: "string" },
     nombre: { type: "string" },
@@ -21,9 +24,9 @@ const { values } = parseArgs({
   },
 });
 
-const email = values.email?.trim().toLowerCase();
-const fullName = values.nombre?.trim();
-const organizationName = values.estudio?.trim() || (fullName ? `Estudio ${fullName}` : "");
+const email = (values.email ?? positionals[0])?.trim().toLowerCase();
+const fullName = (values.nombre ?? positionals[1])?.trim();
+const organizationName = (values.estudio ?? positionals[2])?.trim() || (fullName ? `Estudio ${fullName}` : "");
 
 if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !fullName) {
   console.error(

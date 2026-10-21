@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { PwaSetup } from "@/components/PwaSetup";
 import {
   isProductionDeployment,
   officesLabel,
@@ -60,6 +61,12 @@ export const metadata: Metadata = {
     follow: isProductionDeployment,
   },
   formatDetection: { telephone: false },
+  icons: {
+    icon: [{ url: "/icons/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  // iPhone/iPad: "Agregar a inicio" abre el panel a pantalla completa.
+  appleWebApp: { capable: true, title: "LexDesk", statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = {
@@ -80,6 +87,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Saltar al contenido
         </a>
         <MotionProvider>{children}</MotionProvider>
+        <PwaSetup />
       </body>
     </html>
   );

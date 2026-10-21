@@ -35,7 +35,7 @@ export default async function NonWorkingDaysPage() {
         }
       />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader title={`Días inhábiles desde ${todayIso().slice(0, 4)}`} description={`${days?.length ?? 0} cargados`} />
           {days && days.length > 0 ? (

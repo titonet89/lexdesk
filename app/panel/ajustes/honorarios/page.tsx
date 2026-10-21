@@ -70,7 +70,7 @@ export default async function FeeSettingsPage() {
         </p>
       </Card>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div className="space-y-5">
           <Card>
             <CardHeader title="UMA vigente" />

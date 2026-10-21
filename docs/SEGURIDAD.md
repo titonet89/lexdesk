@@ -59,6 +59,9 @@ La seguridad se diseña en capas: si una falla, las otras siguen protegiendo.
 - Encabezados de seguridad: CSP, HSTS, `X-Frame-Options: DENY`, `nosniff`,
   `Referrer-Policy`, `Permissions-Policy`.
 - El panel no se indexa en buscadores (`noindex` + `robots.txt`).
+- **App instalable (PWA)** sin datos del estudio en el dispositivo: el service worker
+  (`public/sw.js`) solo guarda la pantalla "Sin conexión". Expedientes, clientes y
+  documentos siempre se piden al servidor, así que perder el celular no expone nada.
 
 ## 5. Auditoría y operación
 

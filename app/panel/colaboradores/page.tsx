@@ -49,7 +49,7 @@ export default async function CollaboratorsPage() {
         description="Colegas a quienes podés compartir expedientes puntuales para pedir su opinión."
       />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader title="Colegas invitados" description={`${collaborators?.length ?? 0} en total`} />
           {collaborators && collaborators.length > 0 ? (

@@ -8,11 +8,12 @@ import {
   CalendarDays,
   Check,
   ChevronsUpDown,
+  Download,
   FolderOpen,
   Handshake,
   LayoutDashboard,
   LogOut,
-  Menu,
+  MoreHorizontal,
   Scale,
   Search,
   Settings,
@@ -22,10 +23,12 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { CommandPalette, openCommandPalette } from "@/components/panel/CommandPalette";
+import { InstallAppBanner } from "@/components/panel/InstallAppBanner";
 import { ThemeToggle } from "@/components/panel/ThemeToggle";
 import { signOutAction } from "@/lib/auth/actions";
 import type { Theme } from "@/lib/theme";
 import { switchOrganizationAction } from "@/lib/auth/org-actions";
+import { promptInstall, useCanInstall } from "@/lib/pwa";
 import { cn } from "@/lib/utils";
 
 type Role = "titular" | "colaborador";
@@ -36,6 +39,8 @@ interface NavItem {
   icon: LucideIcon;
   /** Coincidencia exacta (para "Inicio"). */
   exact?: boolean;
+  /** Nombre corto para la barra inferior del celular. */
+  short?: string;
 }
 
 const titularNav: NavItem[] = [
@@ -49,7 +54,7 @@ const titularNav: NavItem[] = [
 ];
 
 const collaboratorNav: NavItem[] = [
-  { href: "/panel", label: "Compartidos conmigo", icon: FolderOpen, exact: true },
+  { href: "/panel", label: "Compartidos conmigo", short: "Compartidos", icon: FolderOpen, exact: true },
   { href: "/panel/ajustes/seguridad", label: "Seguridad", icon: Settings },
 ];
 
@@ -78,12 +83,17 @@ function initials(name: string): string {
     .join("");
 }
 
+function isActive(pathname: string, { href, exact }: NavItem): boolean {
+  return exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+}
+
 function NavLinks({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
     <ul className="space-y-1">
-      {items.map(({ href, label, icon: Icon, exact }) => {
-        const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+      {items.map((item) => {
+        const { href, label, icon: Icon } = item;
+        const active = isActive(pathname, item);
         return (
           <li key={href}>
             <Link
@@ -151,6 +161,64 @@ function OrganizationSwitcher({ active, organizations }: { active: PanelShellPro
   );
 }
 
+/**
+ * Barra inferior en celulares y tablets (como en las apps): las secciones de uso
+ * diario a un toque del pulgar, y "Más" abre el menú completo.
+ */
+function MobileTabBar({ items, onMore }: { items: NavItem[]; onMore: () => void }) {
+  const pathname = usePathname();
+  const tabs = items.slice(0, 4);
+  const moreActive = !tabs.some((item) => isActive(pathname, item));
+  const tabClass = (active: boolean) =>
+    cn(
+      "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors",
+      active ? "text-gold-400" : "text-slate-400 hover:text-white",
+    );
+
+  return (
+    <nav
+      aria-label="Secciones"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-navy-900/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
+    >
+      <ul className="mx-auto flex h-16 max-w-xl">
+        {tabs.map((item) => {
+          const active = isActive(pathname, item);
+          const Icon = item.icon;
+          return (
+            <li key={item.href} className="flex flex-1">
+              <Link href={item.href} aria-current={active ? "page" : undefined} className={tabClass(active)}>
+                <Icon className="size-5.5" aria-hidden="true" />
+                <span className="max-w-full truncate px-1">{item.short ?? item.label}</span>
+              </Link>
+            </li>
+          );
+        })}
+        <li className="flex flex-1">
+          <button type="button" onClick={onMore} className={tabClass(moreActive && tabs.length >= 4)}>
+            <MoreHorizontal className="size-5.5" aria-hidden="true" />
+            Más
+          </button>
+        </li>
+      </ul>
+    </nav>
+  );
+}
+
+function InstallAppButton() {
+  const canInstall = useCanInstall();
+  if (!canInstall) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => void promptInstall()}
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-white"
+    >
+      <Download className="size-4.5" aria-hidden="true" />
+      Instalar app
+    </button>
+  );
+}
+
 function SidebarContent({
   items,
   role,
@@ -200,6 +268,7 @@ function SidebarContent({
 
       <div className="space-y-3 border-t border-white/10 pt-4">
         <ThemeToggle theme={theme} onChange={onThemeChange} />
+        <InstallAppButton />
         <div>
         <p className="truncate px-3 text-sm font-semibold text-white">{displayName}</p>
         <p className="px-3 text-xs text-slate-400">{role === "titular" ? "Titular" : "Colaborador/a"}</p>
@@ -248,7 +317,7 @@ export function PanelShell({ initialTheme, role, displayName, activeOrganization
       </aside>
 
       {/* Barra superior (móvil) */}
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-navy-900 px-4 text-white lg:hidden">
+      <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between bg-navy-900 px-4 pt-[env(safe-area-inset-top)] text-white lg:hidden">
         <Link href="/panel" className="flex min-w-0 items-center gap-2.5">
           <Scale className="size-5 shrink-0 text-gold-400" aria-hidden="true" />
           <span className="truncate font-serif text-base">{activeOrganization.name}</span>
@@ -257,13 +326,11 @@ export function PanelShell({ initialTheme, role, displayName, activeOrganization
         <button type="button" onClick={openCommandPalette} className="grid size-10 place-items-center rounded-lg" aria-label="Buscar">
           <Search className="size-5" aria-hidden="true" />
         </button>
+        {/* El menú completo se abre desde "Más" en la barra inferior. */}
         <Dialog.Root open={open} onOpenChange={setOpen}>
-          <Dialog.Trigger className="grid size-10 place-items-center rounded-lg" aria-label="Abrir menú del panel">
-            <Menu className="size-6" aria-hidden="true" />
-          </Dialog.Trigger>
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 z-40 bg-navy-950/60 backdrop-blur-sm" />
-            <Dialog.Content className="fixed inset-y-0 left-0 z-50 w-[80%] max-w-xs bg-navy-900 px-4 py-6 shadow-2xl">
+            <Dialog.Content className="fixed inset-y-0 left-0 z-50 w-[80%] max-w-xs overflow-y-auto bg-navy-900 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl">
               <Dialog.Title className="sr-only">Menú del panel</Dialog.Title>
               <Dialog.Description className="sr-only">Navegación del panel profesional</Dialog.Description>
               <Dialog.Close
@@ -279,9 +346,16 @@ export function PanelShell({ initialTheme, role, displayName, activeOrganization
         </div>
       </header>
 
-      <main id="panel-contenido" className="px-4 py-6 sm:px-6 lg:ml-64 lg:px-10 lg:py-10">
-        <div className="mx-auto max-w-6xl">{children}</div>
+      <main
+        id="panel-contenido"
+        className="px-4 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:px-6 lg:ml-64 lg:px-10 lg:py-10"
+      >
+        <div className="mx-auto max-w-6xl">
+          <InstallAppBanner />
+          {children}
+        </div>
       </main>
+      <MobileTabBar items={items} onMore={() => setOpen(true)} />
       <CommandPalette role={role} />
     </div>
   );

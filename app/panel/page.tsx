@@ -204,7 +204,7 @@ export default async function PanelHomePage() {
         </Card>
       ) : null}
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <Card>
           <CardHeader
             title="Próximos 14 días"

@@ -220,7 +220,7 @@ function SummarySection({ matter, isTitular }: { matter: MatterWithClient; isTit
   ].filter((row) => row.value);
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
       <Card className="h-fit">
         <CardHeader title="Datos" />
         <dl className="divide-y divide-ink/8">
@@ -452,7 +452,7 @@ async function CollaborationSection({
   };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {isTitular ? (
         <Card className="h-fit">
           <CardHeader title="Acceso de colegas" description="Compartí este expediente para pedir una opinión." />

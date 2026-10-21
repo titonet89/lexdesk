@@ -134,6 +134,8 @@ test.describe("gestión del estudio", () => {
   let otherTitularPage: Page;
 
   test.beforeAll(async ({ browser }) => {
+    // El ingreso puede esperar hasta 30 s a que cambie el código TOTP.
+    test.setTimeout(90_000);
     await deleteUserIfExists(COLLEAGUE.email);
     await clearMailbox();
     titularPage = await (await browser.newContext()).newPage();
@@ -528,5 +530,24 @@ test.describe("gestión del estudio", () => {
     await page.goto(`${matterUrl}?seccion=colaboracion`);
     await expect(page.getByText("no puede compartirse")).toBeVisible();
     await expect(page.getByTestId("shares-list")).toHaveCount(0);
+  });
+
+  test("en el celular ninguna pantalla se desborda y la barra inferior navega", async () => {
+    const page = titularPage;
+    await page.setViewportSize({ width: 360, height: 780 });
+    for (const url of ["/panel", "/panel/agenda", "/panel/expedientes", matterUrl, "/panel/clientes", "/panel/honorarios", "/panel/colaboradores", "/panel/ajustes/seguridad"]) {
+      await page.goto(url);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow, `${url} se desborda hacia el costado`).toBeLessThanOrEqual(0);
+    }
+
+    const tabs = page.getByRole("navigation", { name: "Secciones" });
+    await tabs.getByRole("link", { name: "Agenda" }).click();
+    await page.waitForURL(/\/panel\/agenda$/);
+    await expect(tabs.getByRole("link", { name: "Agenda" })).toHaveAttribute("aria-current", "page");
+    await tabs.getByRole("button", { name: "Más" }).click();
+    await expect(page.getByRole("dialog", { name: "Menú del panel" }).getByRole("link", { name: "Honorarios" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await page.setViewportSize({ width: 1280, height: 800 });
   });
 });

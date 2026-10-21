@@ -86,7 +86,7 @@ export default async function ClientDetailPage({ params }: PageProps<"/panel/cli
         <p className="mb-4 rounded-xl bg-warning-soft px-4 py-3 text-sm text-warning-ink">Este cliente está archivado.</p>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <Card className="h-fit">
           <CardHeader title="Contacto" />
           <div className="space-y-3 p-5 text-sm">

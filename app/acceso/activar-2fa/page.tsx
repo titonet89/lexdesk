@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { EnrollTotpForm } from "@/components/auth/EnrollTotpForm";
 import { SignOutButton } from "@/components/auth/SignOutButton";
+import { isStrongSession } from "@/lib/auth/assurance";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function EnrollPage() {
@@ -10,7 +11,7 @@ export default async function EnrollPage() {
 
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   if (aal?.nextLevel === "aal2") {
-    redirect(aal.currentLevel === "aal2" ? "/panel" : "/acceso/verificar");
+    redirect(isStrongSession(aal) ? "/panel" : "/acceso/verificar");
   }
 
   return (

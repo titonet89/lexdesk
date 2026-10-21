@@ -6,6 +6,7 @@ import { Copy, LoaderCircle, ShieldCheck } from "lucide-react";
 import { TotpCodeInput } from "@/components/auth/TotpCodeInput";
 import { Field, FormMessage } from "@/components/panel/ui";
 import { buttonClasses } from "@/components/ui/button";
+import { afterVerificationPath } from "@/lib/auth/passkey-client";
 import { createClient } from "@/lib/supabase/client";
 
 interface Enrollment {
@@ -72,7 +73,7 @@ export function EnrollTotpForm() {
       setError("El código no coincide. Verificá que la hora del celular esté en automático y probá de nuevo.");
       return;
     }
-    router.replace("/panel");
+    router.replace(await afterVerificationPath("/panel"));
     router.refresh();
   }
 

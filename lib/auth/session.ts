@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { isStrongSession } from "@/lib/auth/assurance";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -28,7 +29,8 @@ export interface MemberSession {
 }
 
 /**
- * Devuelve la sesión SOLO si pasó la verificación en dos pasos y pertenece
+ * Devuelve la sesión SOLO si pasó la verificación en dos pasos (contraseña +
+ * código, o passkey) y pertenece
  * al menos a un estudio activo. Memoizada por request con `cache`.
  */
 export const getMemberSession = cache(async (): Promise<MemberSession | null> => {
@@ -38,7 +40,7 @@ export const getMemberSession = cache(async (): Promise<MemberSession | null> =>
   if (userError || !userData.user) return null;
 
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  if (aal?.currentLevel !== "aal2") return null;
+  if (!isStrongSession(aal)) return null;
 
   const [{ data: profile }, { data: rows }] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", userData.user.id).single(),

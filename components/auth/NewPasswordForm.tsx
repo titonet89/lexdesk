@@ -43,9 +43,11 @@ export function NewPasswordForm({ redirectTo = "/panel" }: NewPasswordFormProps)
           ? "La contraseña nueva tiene que ser distinta de la anterior."
           : updateError.code === "weak_password"
             ? "Esa contraseña es demasiado débil o aparece en filtraciones conocidas. Elegí otra."
-            : updateError.code === "reauthentication_needed"
-              ? "Por seguridad, cerrá sesión y volvé a ingresar antes de cambiar la contraseña."
-              : "No se pudo actualizar la contraseña. Intentá de nuevo.",
+            : updateError.code === "insufficient_aal"
+              ? "Por seguridad, confirmá con el código de tu app antes de cambiar la contraseña."
+              : updateError.code === "reauthentication_needed"
+                ? "Por seguridad, cerrá sesión y volvé a ingresar antes de cambiar la contraseña."
+                : "No se pudo actualizar la contraseña. Intentá de nuevo.",
       );
       return;
     }

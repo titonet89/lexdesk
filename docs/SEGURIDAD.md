@@ -9,6 +9,20 @@ La seguridad se diseña en capas: si una falla, las otras siguen protegiendo.
 - **Sin registro público.** Los usuarios solo se crean por invitación de la titular.
 - **Contraseña + segundo factor (TOTP) obligatorio** para todos los usuarios del panel.
   Sin 2FA verificado (nivel AAL2) no se accede a ningún dato: lo exige la base de datos.
+- **Ingreso con passkey** (huella, rostro o PIN del dispositivo) en los dispositivos de
+  confianza, en lugar de contraseña + código. Equivale a dos factores: el dispositivo que
+  guarda la clave privada y el desbloqueo biométrico, que la app exige siempre
+  (`userVerification: "required"`). Es resistente al phishing: la passkey solo funciona en
+  el dominio del sistema. NIST SP 800-63B-4 admite las passkeys sincronizadas para AAL2.
+  - Supabase emite esas sesiones como AAL1 con el método `passkey`. La base las acepta
+    (`private.has_mfa()`) solo si la cuenta tiene el TOTP verificado.
+  - Registrar una passkey exige una sesión con contraseña + código: Supabase lo impone
+    cuando la cuenta tiene 2FA. Cambiar la contraseña o agregar otra passkey también pide
+    el código, aunque se haya ingresado con huella.
+  - Ante la pérdida de un dispositivo: quitarlo en Ajustes → Seguridad y cerrar sesión en
+    todos los dispositivos.
+  - Las passkeys quedan atadas al dominio. Al pasar a un dominio propio hay que volver a
+    activarlas.
 - Contraseñas de 12 caracteres o más, con mayúsculas, minúsculas y números.
 - Mensajes de error genéricos en el login (no revelan si un email existe).
 - Límite de intentos por IP en el servicio de autenticación.

@@ -6,6 +6,7 @@ import { LoaderCircle, ShieldCheck } from "lucide-react";
 import { TotpCodeInput } from "@/components/auth/TotpCodeInput";
 import { Field, FormMessage } from "@/components/panel/ui";
 import { buttonClasses } from "@/components/ui/button";
+import { afterVerificationPath } from "@/lib/auth/passkey-client";
 import { createClient } from "@/lib/supabase/client";
 
 export function VerifyTotpForm({ nextPath }: { nextPath: string }) {
@@ -44,7 +45,7 @@ export function VerifyTotpForm({ nextPath }: { nextPath: string }) {
       return;
     }
 
-    router.replace(nextPath);
+    router.replace(await afterVerificationPath(nextPath));
     router.refresh();
   }
 

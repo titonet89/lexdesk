@@ -19,7 +19,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/acceso">) 
   return (
     <>
       <h1 className="font-serif text-3xl tracking-tight text-ink">Iniciar sesión</h1>
-      <p className="mt-1.5 text-ink-muted">Ingresá con tu email y contraseña.</p>
+      <p className="mt-1.5 text-ink-muted">Ingresá al panel del estudio.</p>
       {notice ? (
         <p role="status" className="mt-5 rounded-xl bg-accent-soft px-4 py-3 text-sm text-ink-soft">
           {notice}

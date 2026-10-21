@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(53);
+select plan(56);
 
 -- ---------------------------------------------------------------------------
 -- Datos de prueba (como superusuario): dos estudios, A y B.
@@ -78,6 +78,21 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated","aal":"aal1"}', true);
 select is((select count(*)::int from public.clients), 0, 'Titular sin 2FA: no ve clientes');
 select is((select count(*)::int from public.matters), 0, 'Titular sin 2FA: no ve expedientes');
+reset role;
+
+-- ---------------------------------------------------------------------------
+-- Passkey: vale como 2FA solo si la cuenta tiene el TOTP verificado
+-- ---------------------------------------------------------------------------
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated","aal":"aal1","amr":[{"method":"passkey","timestamp":1}]}', true);
+select is((select count(*)::int from public.clients), 0, 'Passkey sin TOTP verificado: no ve clientes');
+reset role;
+insert into auth.mfa_factors (id, user_id, friendly_name, factor_type, status, created_at, updated_at, secret)
+values ('f0000000-0000-0000-0000-00000000000a', '11111111-1111-1111-1111-111111111111', 'App', 'totp', 'verified', now(), now(), 'X');
+set local role authenticated;
+select is((select count(*)::int from public.clients), 1, 'Passkey con TOTP verificado: ve los clientes de su estudio');
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated","aal":"aal1","amr":[{"method":"password","timestamp":1}]}', true);
+select is((select count(*)::int from public.clients), 0, 'Solo contraseña (con TOTP pendiente de verificar en la sesión): no ve clientes');
 reset role;
 
 -- ---------------------------------------------------------------------------

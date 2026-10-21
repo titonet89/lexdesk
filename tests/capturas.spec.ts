@@ -20,7 +20,7 @@ test("capturas del README", async ({ browser }) => {
   await page.goto("/acceso");
   await page.getByLabel("Email").fill("demo@lexdesk.demo");
   await page.getByLabel("Contraseña", { exact: true }).fill("Demo-LexDesk-2026");
-  await page.getByRole("button", { name: "Ingresar" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await page.waitForURL(/activar-2fa/);
   await page.getByText("¿No podés escanear?").click();
   const secret = (await page.getByTestId("totp-secret").textContent())?.trim() ?? "";

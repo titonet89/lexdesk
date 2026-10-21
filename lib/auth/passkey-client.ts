@@ -182,7 +182,7 @@ export async function shouldOfferPasskey(): Promise<boolean> {
 /** Destino después de verificar el código: la oferta de huella o directamente `nextPath`. */
 export async function afterVerificationPath(nextPath: string): Promise<string> {
   if (!nextPath.startsWith("/panel") || !(await shouldOfferPasskey())) return nextPath;
-  return `/acceso/activar-huella?next=${encodeURIComponent(nextPath)}`;
+  return `/acceso/ingreso-rapido?next=${encodeURIComponent(nextPath)}`;
 }
 
 export type PasskeyAvailability = "unknown" | "hidden" | "available" | "preferred";

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Fingerprint, LogOut, ShieldCheck, Trash2 } from "lucide-react";
+import { ArrowLeft, KeyRound, LogOut, ShieldCheck, Trash2 } from "lucide-react";
 import { NewPasswordForm } from "@/components/auth/NewPasswordForm";
 import { AddPasskeyButton } from "@/components/panel/settings/AddPasskeyButton";
 import { ProfileForm } from "@/components/panel/settings/ProfileForm";
@@ -21,7 +21,7 @@ export default async function SecurityPage() {
   const [{ data: factors }, { data: aal }, { data: passkeys }] = await Promise.all([
     supabase.auth.mfa.listFactors(),
     supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
-    // Con la clave secreta: Supabase no deja listar passkeys a quien ingresó con huella.
+    // Con la clave secreta: Supabase no deja listar passkeys a quien ingresó con una passkey.
     createAdminClient().auth.admin.passkey.listPasskeys({ userId }),
   ]);
   // Agregar passkeys o cambiar la contraseña exige contraseña + código en esta sesión.
@@ -73,15 +73,15 @@ export default async function SecurityPage() {
 
           <Card>
             <CardHeader
-              title="Ingreso con huella o rostro"
-              description="Entrá sin contraseña ni código en tus dispositivos de confianza."
+              title="Ingreso rápido sin contraseña"
+              description="Entrá con el desbloqueo de tus dispositivos de confianza (rostro, huella o PIN), sin contraseña ni código."
             />
             <div className="space-y-4 p-5 text-sm">
               {passkeys && passkeys.length > 0 ? (
-                <ul className="space-y-3" aria-label="Dispositivos con huella activada">
+                <ul className="space-y-3" aria-label="Dispositivos con ingreso rápido">
                   {passkeys.map((passkey) => (
                     <li key={passkey.id} className="flex items-center gap-3 text-ink-soft">
-                      <Fingerprint className="size-5 text-success-ink" aria-hidden="true" />
+                      <KeyRound className="size-5 text-success-ink" aria-hidden="true" />
                       <span className="flex-1">
                         {passkey.friendly_name ?? "Dispositivo"}
                         <span className="block text-xs text-ink-muted">
@@ -92,7 +92,7 @@ export default async function SecurityPage() {
                       <ConfirmActionButton
                         action={deletePasskeyAction.bind(null, passkey.id)}
                         title="¿Quitar este dispositivo?"
-                        description="Ya no se va a poder ingresar con huella desde ese dispositivo. Podés volver a activarlo cuando quieras."
+                        description="Ya no se va a poder ingresar sin contraseña desde ese dispositivo. Podés volver a activarlo cuando quieras."
                         confirmLabel="Quitar"
                         ariaLabel={`Quitar ${passkey.friendly_name ?? "dispositivo"}`}
                         className="rounded-lg p-2"
@@ -103,7 +103,7 @@ export default async function SecurityPage() {
                   ))}
                 </ul>
               ) : (
-                <p className="text-ink-muted">Todavía no activaste la huella en ningún dispositivo.</p>
+                <p className="text-ink-muted">Todavía no activaste el ingreso rápido en ningún dispositivo.</p>
               )}
               <AddPasskeyButton canRegister={hasCodeVerified} />
               <p className="text-ink-muted">
@@ -139,8 +139,8 @@ export default async function SecurityPage() {
               <NewPasswordForm redirectTo="/panel/ajustes/seguridad" />
             ) : (
               <div className="space-y-4 text-sm text-ink-soft">
-                <p>Ingresaste con tu huella. Para cambiar la contraseña, primero confirmá con el código de tu app.</p>
-                <Link href="/acceso/verificar?next=/panel/ajustes/seguridad" className={buttonClasses("secondary", "sm")}>
+                <p>Ingresaste sin contraseña. Para cambiarla, primero confirmá con el código de tu app.</p>
+                <Link href="/acceso/verificar?next=/panel/ajustes/seguridad" className={buttonClasses("secondary", "sm", "h-auto min-h-9 py-2 text-center whitespace-normal")}>
                   <ShieldCheck aria-hidden="true" />
                   Confirmar con el código para cambiar la contraseña
                 </Link>

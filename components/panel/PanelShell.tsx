@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { CommandPalette, openCommandPalette } from "@/components/panel/CommandPalette";
 import { InstallAppBanner } from "@/components/panel/InstallAppBanner";
+import { LexDeskMark } from "@/components/LexDeskMark";
 import { ThemeToggle } from "@/components/panel/ThemeToggle";
 import { signOutAction } from "@/lib/auth/actions";
 import type { Theme } from "@/lib/theme";
@@ -236,13 +237,8 @@ function SidebarContent({
 }) {
   return (
     <div className="flex h-full flex-col">
-      <Link href="/panel" onClick={onNavigate} className="flex items-center gap-2.5 px-2 text-white">
-        <span className="grid size-9 place-items-center rounded-full border border-gold-600/60 text-gold-400">
-          <Scale className="size-4.5" aria-hidden="true" />
-        </span>
-        <span className="font-serif text-xl leading-none tracking-tight">
-          Lex<span className="text-gold-400">Desk</span>
-        </span>
+      <Link href="/panel" onClick={onNavigate} className="px-2 text-white" aria-label="LexDesk, ir al inicio">
+        <LexDeskMark variant="sidebar" />
       </Link>
 
       <div className="mt-6 space-y-2">

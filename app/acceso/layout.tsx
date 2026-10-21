@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BrandMark } from "@/components/BrandMark";
+import { LexDeskMark } from "@/components/LexDeskMark";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -30,6 +31,9 @@ export default function AccessLayout({ children }: LayoutProps<"/acceso">) {
       <p className="mt-6 max-w-sm text-center text-xs leading-relaxed text-slate-400">
         Acceso restringido. Toda actividad queda registrada y está amparada por el secreto profesional.
       </p>
+      <footer className="mt-10">
+        <LexDeskMark variant="footer" />
+      </footer>
     </div>
   );
 }

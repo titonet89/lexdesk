@@ -3,7 +3,7 @@ import { EnrollPasskeyOffer } from "@/components/auth/EnrollPasskeyOffer";
 import { safeNextPath } from "@/lib/auth/redirects";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function EnrollPasskeyPage({ searchParams }: PageProps<"/acceso/activar-huella">) {
+export default async function EnrollPasskeyPage({ searchParams }: PageProps<"/acceso/ingreso-rapido">) {
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) redirect("/acceso");
@@ -19,8 +19,8 @@ export default async function EnrollPasskeyPage({ searchParams }: PageProps<"/ac
     <>
       <h1 className="font-serif text-3xl tracking-tight text-ink">Entrá más rápido la próxima vez</h1>
       <p className="mt-1.5 text-ink-muted">
-        Activá el ingreso con tu huella, tu rostro o el PIN de este dispositivo. Ya no vas a necesitar la contraseña
-        ni el código de la app en este equipo.
+        Activá el ingreso rápido: vas a entrar con el mismo desbloqueo que usás en este dispositivo (rostro, huella o
+        PIN), sin contraseña ni código.
       </p>
       <EnrollPasskeyOffer nextPath={nextPath} />
     </>

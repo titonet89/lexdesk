@@ -51,7 +51,7 @@ test.afterAll(async () => {
   await page.close();
 });
 
-test("después de activar el 2FA se ofrece la huella y queda activada", async () => {
+test("después de activar el 2FA se ofrece el ingreso rápido y queda activado", async () => {
   await page.goto("/acceso");
   await page.getByLabel("Email").fill(USER.email);
   await page.getByLabel("Contraseña", { exact: true }).fill(USER.password);
@@ -63,18 +63,18 @@ test("después de activar el 2FA se ofrece la huella y queda activada", async ()
   await page.getByLabel("Código de la app").fill(await nextCode(page));
   await page.getByRole("button", { name: "Activar y continuar" }).click();
 
-  await page.waitForURL(/\/acceso\/activar-huella/);
-  await page.getByRole("button", { name: "Activar huella en este dispositivo" }).click();
+  await page.waitForURL(/\/acceso\/ingreso-rapido/);
+  await page.getByRole("button", { name: "Activar ingreso rápido" }).click();
   await page.waitForURL(/\/panel$/);
 });
 
-test("con la huella activada, se ingresa con un solo toque", async () => {
+test("con el ingreso rápido activado, se entra con un solo toque", async () => {
   await page.getByRole("button", { name: "Cerrar sesión" }).first().click();
   await page.waitForURL(/\/acceso\?estado=sesion-cerrada/);
 
-  // En este dispositivo ya se usa la huella: el formulario de contraseña queda oculto.
+  // En este dispositivo ya se usa el ingreso rápido: el formulario de contraseña queda oculto.
   await expect(page.getByLabel("Email")).toBeHidden();
-  await page.getByRole("button", { name: "Ingresar con huella o rostro" }).click();
+  await page.getByRole("button", { name: "Ingresar sin contraseña" }).click();
   await page.waitForURL(/\/panel$/);
 
   // La base de datos acepta la sesión con passkey (RLS): se puede cargar un cliente.
@@ -86,11 +86,11 @@ test("con la huella activada, se ingresa con un solo toque", async () => {
 
 test("Seguridad lista el dispositivo y permite quitarlo", async () => {
   await page.goto("/panel/ajustes/seguridad");
-  const devices = page.getByRole("list", { name: "Dispositivos con huella activada" });
+  const devices = page.getByRole("list", { name: "Dispositivos con ingreso rápido" });
   await expect(devices.getByRole("listitem")).toHaveCount(1);
   await expect(devices).toContainText(/Windows|Linux|Mac/);
 
-  // Con sesión de huella, agregar otro dispositivo pide confirmar con el código.
+  // Con sesión de passkey, agregar otro dispositivo pide confirmar con el código.
   await expect(page.getByRole("link", { name: "Confirmar con el código para agregar un dispositivo" })).toBeVisible();
 
   // Cambiar la contraseña también exige el código.
@@ -101,18 +101,18 @@ test("Seguridad lista el dispositivo y permite quitarlo", async () => {
   await page.getByRole("button", { name: "Verificar" }).click();
   await page.waitForURL(/\/panel\/ajustes\/seguridad$/);
   await expect(page.getByTestId("new-password-form")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Activar huella en este dispositivo" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Activar ingreso rápido en este dispositivo" })).toBeVisible();
 
   await devices.getByRole("button", { name: /^Quitar / }).click();
   await page.getByRole("button", { name: "Quitar", exact: true }).click();
-  await expect(page.getByText("Todavía no activaste la huella en ningún dispositivo.")).toBeVisible();
+  await expect(page.getByText("Todavía no activaste el ingreso rápido en ningún dispositivo.")).toBeVisible();
 });
 
-test("sin passkey registrada, la huella no da acceso y se ofrece la contraseña", async () => {
+test("sin passkey registrada, el ingreso rápido no da acceso y se ofrece la contraseña", async () => {
   await page.getByRole("button", { name: "Cerrar sesión" }).first().click();
   await page.waitForURL(/\/acceso\?estado=sesion-cerrada/);
-  await page.getByRole("button", { name: "Ingresar con huella o rostro" }).click();
-  await expect(page.getByTestId("login-form").getByRole("alert")).toContainText("No pudimos ingresar con la huella");
+  await page.getByRole("button", { name: "Ingresar sin contraseña" }).click();
+  await expect(page.getByTestId("login-form").getByRole("alert")).toContainText("No pudimos ingresar sin contraseña");
   await expect(page.getByLabel("Email")).toBeVisible();
   await page.goto("/panel");
   await expect(page).toHaveURL(/\/acceso$/);

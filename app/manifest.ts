@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { brand } from "@/lib/brand";
 
 /**
  * Manifiesto de la app instalable (PWA): con esto el panel se puede agregar a
@@ -10,7 +11,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/panel",
     name: "LexDesk · Panel del estudio",
     short_name: "LexDesk",
-    description: "Expedientes, agenda de plazos, clientes y honorarios del estudio.",
+    description: `${brand.tagline}: expedientes, agenda de plazos, clientes y honorarios del estudio.`,
     lang: "es-AR",
     dir: "ltr",
     start_url: "/panel",

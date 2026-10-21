@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Fingerprint, LoaderCircle, LogIn } from "lucide-react";
+import { Eye, EyeOff, KeyRound, LoaderCircle, LogIn } from "lucide-react";
 import { Field, FormMessage, Input } from "@/components/panel/ui";
 import { buttonClasses } from "@/components/ui/button";
 import { isStrongSession } from "@/lib/auth/assurance";
@@ -14,7 +14,7 @@ import { createClient } from "@/lib/supabase/client";
  * El login se hace desde el navegador a propósito: así el límite de intentos
  * del servicio de autenticación se aplica por la IP real de cada persona.
  *
- * Si el navegador admite passkeys se ofrece "Ingresar con huella o rostro". En
+ * Si el navegador admite passkeys se ofrece "Ingresar sin contraseña". En
  * los dispositivos donde ya se usó, es la única opción visible y el formulario
  * de contraseña queda detrás de un enlace.
  */
@@ -40,7 +40,7 @@ export function LoginForm() {
     setPending(null);
     if (result.reason === "cancelled") return;
     setError(
-      "No pudimos ingresar con la huella. Si todavía no la activaste en este dispositivo, ingresá con tu email y contraseña.",
+      "No pudimos ingresar sin contraseña. Si todavía no activaste el ingreso rápido en este dispositivo, ingresá con tu email y contraseña.",
     );
     setPasswordOpen(true);
   }
@@ -94,10 +94,11 @@ export function LoginForm() {
             {pending === "passkey" ? (
               <LoaderCircle className="animate-spin" aria-hidden="true" />
             ) : (
-              <Fingerprint aria-hidden="true" />
+              <KeyRound aria-hidden="true" />
             )}
-            {pending === "passkey" ? "Esperando al dispositivo…" : "Ingresar con huella o rostro"}
+            {pending === "passkey" ? "Esperando al dispositivo…" : "Ingresar sin contraseña"}
           </button>
+          <p className="-mt-2 text-center text-xs text-balance text-ink-muted">Con el rostro, la huella o el PIN de tu dispositivo.</p>
           {passwordOpen ? (
             <p className="flex items-center gap-3 text-xs font-medium tracking-wide text-ink-muted uppercase">
               <span className="h-px flex-1 bg-ink/10" aria-hidden="true" />o con tu email

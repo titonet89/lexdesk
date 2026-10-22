@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
+import { DemoAccess } from "@/components/auth/DemoAccess";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { getMemberSession } from "@/lib/auth/session";
+import { isDemo } from "@/lib/demo";
 
 const notices: Record<string, string> = {
   inactivo: "Tu usuario está desactivado. Consultá con la titular del estudio.",
@@ -18,14 +20,16 @@ export default async function LoginPage({ searchParams }: PageProps<"/acceso">) 
 
   return (
     <>
-      <h1 className="font-serif text-3xl tracking-tight text-ink">Iniciar sesión</h1>
-      <p className="mt-1.5 text-ink-muted">Ingresá al panel del estudio.</p>
+      <h1 className="font-serif text-3xl tracking-tight text-ink">{isDemo ? "Demo de LexDesk" : "Iniciar sesión"}</h1>
+      <p className="mt-1.5 text-ink-muted">
+        {isDemo ? "Recorré el panel de un estudio de ejemplo, sin contraseña." : "Ingresá al panel del estudio."}
+      </p>
       {notice ? (
         <p role="status" className="mt-5 rounded-xl bg-accent-soft px-4 py-3 text-sm text-ink-soft">
           {notice}
         </p>
       ) : null}
-      <LoginForm />
+      {isDemo ? <DemoAccess /> : <LoginForm />}
     </>
   );
 }

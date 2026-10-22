@@ -9,6 +9,7 @@ import { Badge, Card, CardHeader, PageHeader } from "@/components/panel/ui";
 import { buttonClasses } from "@/components/ui/button";
 import { deletePasskeyAction, signOutEverywhereAction } from "@/lib/auth/actions";
 import { requireMember } from "@/lib/auth/session";
+import { isDemo } from "@/lib/demo";
 import { formatInZone } from "@/lib/panel/dates";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -17,6 +18,7 @@ export const metadata: Metadata = { title: "Seguridad" };
 
 export default async function SecurityPage() {
   const { profile, email, active, userId } = await requireMember();
+  if (isDemo) return <DemoSecurity />;
   const supabase = await createClient();
   const [{ data: factors }, { data: aal }, { data: passkeys }] = await Promise.all([
     supabase.auth.mfa.listFactors(),
@@ -149,6 +151,30 @@ export default async function SecurityPage() {
           </div>
         </Card>
       </div>
+    </>
+  );
+}
+
+/** En la demo la cuenta es compartida: se explica la seguridad en lugar de permitir cambiarla. */
+function DemoSecurity() {
+  return (
+    <>
+      <PageHeader title="Seguridad de la cuenta" />
+      <Card>
+        <CardHeader title="En la demo, la seguridad está simplificada" />
+        <div className="space-y-3 p-5 text-sm text-ink-soft">
+          <p>
+            Para que puedas recorrer el sistema sin trabas, en la demo se entra con un botón. En tu LexDesk real, desde
+            esta pantalla:
+          </p>
+          <ul className="list-disc space-y-1.5 pl-5">
+            <li>Activás el ingreso rápido con el rostro, la huella o el PIN de tus dispositivos.</li>
+            <li>Ves en qué dispositivos lo activaste y podés quitar cualquiera (por ejemplo, si perdés el celular).</li>
+            <li>Gestionás la verificación en dos pasos y cambiás tu contraseña.</li>
+            <li>Cerrás tu sesión en todos los dispositivos con un toque.</li>
+          </ul>
+        </div>
+      </Card>
     </>
   );
 }

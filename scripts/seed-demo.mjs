@@ -1,20 +1,29 @@
-// Carga datos FICTICIOS de demostración en la base LOCAL (para capturas y pruebas manuales).
+// Carga datos FICTICIOS de demostración (para capturas, pruebas manuales y la demo pública).
 //
-// Uso: npm run db:seed-demo
-// Crea la usuaria demo@lexdesk.demo / Demo-LexDesk-2026 (titular) y datos de ejemplo.
-// Al primer ingreso se pide activar el 2FA, como en producción.
+// Uso: npm run db:seed-demo                       (base LOCAL)
+//      npm run db:seed-demo:nube                  (base de la DEMO en la nube, ver .env.demo.local)
+// Crea la usuaria demo@lexdesk.demo (titular) y datos de ejemplo. Localmente, al
+// primer ingreso se pide activar el 2FA; en la demo lo completa el botón "Entrar a la demo".
 
 import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const secretKey = process.env.SUPABASE_SECRET_KEY;
 if (!url || !secretKey) throw new Error("Faltan NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SECRET_KEY.");
-if (!/^http:\/\/(127\.0\.0\.1|localhost)/.test(url)) {
-  throw new Error("El seed de demostración solo se ejecuta contra Supabase LOCAL.");
+/** Proyecto del sistema REAL: el seed borra y recrea datos, así que nunca puede correr ahí. */
+const PRODUCTION_REF = "auagltrcdwticvbiezvf";
+const isLocal = /^http:\/\/(127\.0\.0\.1|localhost)/.test(url);
+if (url.includes(PRODUCTION_REF)) throw new Error("El seed de demostración NUNCA se ejecuta contra la base real.");
+if (!isLocal && process.env.LEXDESK_DEMO_SEED !== "1") {
+  throw new Error("Fuera de la base local, el seed solo corre contra la DEMO (LEXDESK_DEMO_SEED=1).");
 }
 
 const admin = createClient(url, secretKey, { auth: { autoRefreshToken: false, persistSession: false } });
-const DEMO = { email: "demo@lexdesk.demo", password: "Demo-LexDesk-2026", name: "Dra. Lucía Herrera" };
+const DEMO = {
+  email: process.env.DEMO_USER_EMAIL ?? "demo@lexdesk.demo",
+  password: process.env.DEMO_USER_PASSWORD ?? "Demo-LexDesk-2026",
+  name: "Dra. Lucía Herrera",
+};
 
 const { data: users } = await admin.auth.admin.listUsers({ perPage: 1000 });
 const previous = users?.users.find((user) => user.email === DEMO.email);
@@ -126,4 +135,4 @@ await admin.from("non_working_days").upsert(
   { onConflict: "organization_id,day" },
 );
 
-console.log(`\nDatos de demostración cargados.\n  Usuario: ${DEMO.email}\n  Contraseña: ${DEMO.password}\n`);
+console.log(`\nDatos de demostración cargados.\n  Usuario: ${DEMO.email}${isLocal ? `\n  Contraseña: ${DEMO.password}` : ""}\n`);

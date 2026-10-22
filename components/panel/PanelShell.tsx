@@ -29,6 +29,7 @@ import { ThemeToggle } from "@/components/panel/ThemeToggle";
 import { signOutAction } from "@/lib/auth/actions";
 import type { Theme } from "@/lib/theme";
 import { switchOrganizationAction } from "@/lib/auth/org-actions";
+import { isDemo } from "@/lib/demo";
 import { promptInstall, useCanInstall } from "@/lib/pwa";
 import { cn } from "@/lib/utils";
 
@@ -347,6 +348,16 @@ export function PanelShell({ initialTheme, role, displayName, activeOrganization
         className="px-4 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:px-6 lg:ml-64 lg:px-10 lg:py-10"
       >
         <div className="mx-auto max-w-6xl">
+          {isDemo ? (
+            <p
+              role="note"
+              className="mb-6 rounded-2xl border border-gold-600/30 bg-accent-soft px-4 py-2.5 text-sm text-ink-soft"
+              data-testid="demo-banner"
+            >
+              <strong className="text-ink">Demo de LexDesk:</strong> los datos son ficticios y la cuenta es compartida. No
+              cargues información real de clientes.
+            </p>
+          ) : null}
           <InstallAppBanner />
           {children}
         </div>
